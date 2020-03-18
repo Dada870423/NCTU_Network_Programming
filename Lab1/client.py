@@ -10,4 +10,4 @@ while True:
     cmd = raw_input("Please input msg:")
     s.send(cmd)
     data = s.recv(1024)
-    print "server send : %s " % (data)
+    print ("server send :  "  (data))
