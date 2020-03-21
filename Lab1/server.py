@@ -28,7 +28,8 @@ def Client_Work(ClientSocket, addr):
         ClientSocket.send(msg.encode('utf-8'))
         msg_input = ClientSocket.recv(1024).decode('utf-8')
         msg_input = msg_input.replace('\n', '').replace('\r', '')
-        print("msg : ", msg_input, "  len: ", len(msg_input))
+        msg_split = msg_input.split()
+        print("msg : ", msg_input, "  len: ", len(msg_split))
 		
 
 bind_ip = "0.0.0.0"
