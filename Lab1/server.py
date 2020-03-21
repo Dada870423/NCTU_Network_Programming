@@ -50,19 +50,25 @@ def Client_Work(ClientSocket, addr):
             if login > -1:
                 msg_err = "Please logout first"
                 ClientSocket.send(msg_err.encode('utf-8'))
+                continue
             cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],))
             cursor = cursor.fetchone()
             if cursor != None: #login success
                 print("She is ", cursor[0], cursor[1])
                 login = cursor[0]
-                msg_suc = "Welcome, " + cursor[1]
+                msg_suc = "Welcome, " + cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             else: # no such person
-                msg_err = "Login failed"
+                msg_err = "Login failed" + "\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-
-
-
+        elif len(msg_split) == 1:
+            if msg_input == "login":
+                msg_err = "Usage: login <username> <password>\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+        elif len(msg_split) > 1:
+            if msg_split[0] == "login":
+                msg_err = "Usage: login <username> <password>\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
 
 
 bind_ip = "0.0.0.0"
