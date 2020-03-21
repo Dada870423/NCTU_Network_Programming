@@ -40,10 +40,17 @@ def Client_Work(ClientSocket, addr):
                 print("Username is already used")
                 msg_err = "Username is already register!!!\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-        elif len(msg_split) == 1 and msg_input == "exit":
-            msg_bye = "Time to say bye"
-            ClientSocket.send(msg_bye.encode('utf-8'))
-            server.close()
+        elif len(msg_split) == 1:
+            if msg_input == "register":
+                msg_err = "Should type whole command"
+                ClientSocket.send(msg_err.encode('utf-8'))
+        elif len(msg_split) > 1:
+            if msg_split[0] == "register":
+                msg_err = "Should type whole command"
+                ClientSocket.send(msg_err.encode('utf-8'))
+
+
+
 
 bind_ip = "0.0.0.0"
 bind_port = 3110
