@@ -93,6 +93,10 @@ def Client_Work(ClientSocket, addr):
                 ClientSocket.send(msg_err.encode('utf-8'))
 
 
+        if msg_input == "exit":
+            print("the client ", login," want to bye")
+            server.shutdown(2)
+            server.close()
 
 
 
@@ -112,5 +116,5 @@ print ("[*] Listening on  ", bind_ip,  bind_port)
 
 while True:
     client,addr = server.accept()
-    print ("New Client connection :", addr)
+    print ("New connection :", addr)
     _thread.start_new_thread(Client_Work, (client, addr))
