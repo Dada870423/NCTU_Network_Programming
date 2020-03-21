@@ -2,7 +2,7 @@ import socket
 import _thread
 import sys
 import sqlite3
-
+from sqlite3 import Error
 
 def Client_Work(ClientSocket, addr):
     msg = "Welcome to my BBS server\r\n"
@@ -40,7 +40,10 @@ def Client_Work(ClientSocket, addr):
                 print("Username is already used")
                 msg_err = "Username is already register!!!\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-
+        elif len(msg_split) == 1 and msg_input == "exit":
+            msg_bye = "Time to say bye"
+            ClientSocket.send(msg_bye.encode('utf-8'))
+            server.close()
 
 bind_ip = "0.0.0.0"
 bind_port = 3110
