@@ -32,9 +32,15 @@ def Client_Work(ClientSocket, addr):
 
         print("msg : ", msg_input, "  len: ", len(msg_split))
         if len(msg_split) == 4 and msg_split[0] == "register":
-            cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
-            conn.commit()
-		
+            try:
+                cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
+                conn.commit()
+                print("Insertion is success")
+            except Error:
+                print("Username is already used")
+                msg_err = "Username is already register!!!\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+
 
 bind_ip = "0.0.0.0"
 bind_port = 3110
