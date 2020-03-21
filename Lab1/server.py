@@ -14,19 +14,21 @@ def Client_Work(ClientSocket, addr):
     print("opened databases successfully")
     c = conn.cursor()
 ##########
-    str_input = "register name123 email pass"
-    str_split = str_input.split()
-    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (str_split[1], str_split[2], str_split[3]))
-    conn.commit()
-    conn.close()
+    #str_input = "register name123 email pass"
+    #str_split = str_input.split()
+    #cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (str_split[1], str_split[2], str_split[3]))
+    #conn.commit()
+    #conn.close()
 ##########
     while True:
-        if msg_input != "":
-            msg = "% "
-            ClientSocket.send(msg.encode('utf-8'))
+        
+        ##  msg_input = ClientSocket.recv(1024).decode('utf-8')
+        ##  if msg_input != "":
+        msg = "% "
+        ClientSocket.send(msg.encode('utf-8'))
         msg_input = ClientSocket.recv(1024).decode('utf-8')
         msg_input = msg_input.replace('\n', '').replace('\r', '')
-        print(msg_input)
+        print("msg : ", msg_input, "  len: ", len(msg_input))
 		
 
 bind_ip = "0.0.0.0"
