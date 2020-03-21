@@ -1,12 +1,25 @@
 import socket
 import _thread
 import sys
+import sqlite3
+
 
 def Client_Work(ClientSocket, addr):
     msg = "Welcome to my BBS server\r\n"
     ClientSocket.send(msg.encode('utf-8'))
     ClientSocket.recv(1024)
     msg_input = ""
+    
+    conn = sqlite3.connect('BBS.db')
+    print("opened databases successfully")
+    c = conn.cursor()
+##########
+    str_input = "register name email pass"
+    str_split = str_input.split()
+    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (str_split[1], str_split[2], str_split[3]))
+    conn.commit()
+    comm.close()
+##########
     while True:
         if msg_input != "":
             msg = "% "
