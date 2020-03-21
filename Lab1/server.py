@@ -75,7 +75,8 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,))
                 cursor = cursor.fetchone()
                 print("I am ", cursor[0], "\r\n")
-                ClientSocket.send(cursor[0].encode('utf-8'))
+                msg_suc = cursor[1] + "\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
             else:
                 msg_err = "Please login first\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
