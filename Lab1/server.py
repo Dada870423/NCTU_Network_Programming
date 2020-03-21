@@ -53,7 +53,7 @@ def Client_Work(ClientSocket, addr):
                 continue
             cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],))
             cursor = cursor.fetchone()
-            if cursor != None and sursor[2] == msg_split[3]: #person is exist
+            if cursor != None and cursor[3] == msg_split[2]: #person is exist
                 print("She is ", cursor[0], cursor[1])
                 login = cursor[0]
                 msg_suc = "Welcome, " + cursor[1] + "\r\n"
@@ -69,6 +69,17 @@ def Client_Work(ClientSocket, addr):
             if msg_split[0] == "login":
                 msg_err = "Usage: login <username> <password>\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
+
+        if msg_input == "whoami":
+            if login > -1:
+                cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,))
+                cursor = cursor.fetchone()
+                print("I am ", cursor[0], "\r\n")
+                ClientSocket.send(cursor[0].encode('utf-8'))
+            else:
+                msg_err = "Please login first\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+
 
 
 bind_ip = "0.0.0.0"
