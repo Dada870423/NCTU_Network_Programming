@@ -8,22 +8,16 @@ def Client_Work(ClientSocket, addr):
     msg = "Welcome to my BBS server\r\n"
     ClientSocket.send(msg.encode('utf-8'))
     ClientSocket.recv(1024)
-    msg_input = ""
+    msg_input = ""  # get out the trash
     
+    login = -1 ## check login or not and whoami
+
+
     conn = sqlite3.connect('BBS.db')
     print("opened databases successfully")
     c = conn.cursor()
-##########
-    #str_input = "register name123 email pass"
-    #str_split = str_input.split()
-    #cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (str_split[1], str_split[2], str_split[3]))
-    #conn.commit()
-    #conn.close()
-##########
     while True:
         
-        ##  msg_input = ClientSocket.recv(1024).decode('utf-8')
-        ##  if msg_input != "":
         msg = "% "
         ClientSocket.send(msg.encode('utf-8'))
         msg_input = ClientSocket.recv(1024).decode('utf-8')
@@ -50,6 +44,18 @@ def Client_Work(ClientSocket, addr):
             if msg_split[0] == "register":
                 msg_err = "Usage: register <username> <email> <password>\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
+
+        
+        if len(msg_split) == 3 and msg_split[0] == "login":
+            if login > -1:
+                msg_err = "Please logout first"
+                ClientSocket.send(msg_err.encode('utf-8'))
+            cursor = c.execute('SELECT UID FROM USERS WHERE Username = ?', (msg_split[1],))
+            cursor = cursor.fetchone()
+            if cursor != None:
+                print("She is cursor[0]")
+
+
 
 
 
