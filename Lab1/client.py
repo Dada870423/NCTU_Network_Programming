@@ -1,5 +1,5 @@
 import socket
-
+## no need the clinet
 HOST = '54.198.148.205'
 PORT = 3110
 
