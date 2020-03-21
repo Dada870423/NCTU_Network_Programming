@@ -81,6 +81,23 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
 
+        if msg_input == "logout":
+            if login > -1:
+                cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,))
+                cursor = cursor.fetchone()
+                print("I am ", cursor[0], "\r\n")
+                msg_suc = "Bye, " + cursor[1] + "\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+            else:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+
+
+
+
+
+
+
 
 
 bind_ip = "0.0.0.0"
