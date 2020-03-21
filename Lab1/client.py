@@ -1,6 +1,6 @@
 import socket
 ## no need the clinet
-HOST = '54.198.148.205'
+#HOST = '54.198.148.205'
 PORT = 3110
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
