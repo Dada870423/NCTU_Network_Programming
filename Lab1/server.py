@@ -29,9 +29,11 @@ def Client_Work(ClientSocket, addr):
         msg_input = ClientSocket.recv(1024).decode('utf-8')
         msg_input = msg_input.replace('\n', '').replace('\r', '')
         msg_split = msg_input.split()
-        if len(msg_split) == 4 and msg_splie[0] == "register":
-            cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_splie[3]))
+
         print("msg : ", msg_input, "  len: ", len(msg_split))
+        if len(msg_split) == 4 and msg_split[0] == "register":
+            cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
+            conn.commit()
 		
 
 bind_ip = "0.0.0.0"
