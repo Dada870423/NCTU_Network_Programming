@@ -14,11 +14,11 @@ def Client_Work(ClientSocket, addr):
     print("opened databases successfully")
     c = conn.cursor()
 ##########
-    str_input = "register name email pass"
+    str_input = "register name123 email pass"
     str_split = str_input.split()
     cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (str_split[1], str_split[2], str_split[3]))
     conn.commit()
-    comm.close()
+    conn.close()
 ##########
     while True:
         if msg_input != "":
