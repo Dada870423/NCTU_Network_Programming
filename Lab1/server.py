@@ -36,17 +36,19 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
                 conn.commit()
                 print("Insertion is success")
+                msg_suc = "Register successfully\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
             except Error:
                 print("Username is already used")
-                msg_err = "Username is already register!!!\r\n"
+                msg_err = "Username is already used\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
         elif len(msg_split) == 1:
             if msg_input == "register":
-                msg_err = "Should type whole command"
+                msg_err = "Usage: register <username> <email> <password>\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
         elif len(msg_split) > 1:
             if msg_split[0] == "register":
-                msg_err = "Should type whole command"
+                msg_err = "Usage: register <username> <email> <password>\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
 
 
