@@ -5,16 +5,20 @@ import sqlite3
 from sqlite3 import Error
 
 def Client_Work(ClientSocket, addr):
-    msg = "************************************************\r\n**   "
+    msg = "*************************************************************************************************************************************\r\n"
     ClientSocket.send(msg.encode('utf-8'))
-    msg = "Welcome to my BBS server   **\r\n"
-
-
-
-
-
+    #print welcome msg
+    msg = "__        __   _                            _          _   _             ____  ____ ____ \r\n"
     ClientSocket.send(msg.encode('utf-8'))
-    msg = "************************************************\r\n"
+    msg = "\ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___   | |_| |__   ___   | __ )| __ ) ___| \r\n"
+    ClientSocket.send(msg.encode('utf-8'))
+    msg = " \ \ /\ / / _ \ |/ __/ _ \| '_ ` _ \ / _ \ | __/ _ \  | __| '_ \ / _ \  |  _ \|  _ \___ \   / __|/ _ \ '__\ \ / / _ \ '__| \r\n"
+    ClientSocket.send(msg.encode('utf-8'))
+    msg = "  \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) | | |_| | | |  __/  | |_) | |_) |__) |  \__ \  __/ |   \ V /  __/ | \r\n"
+    ClientSocket.send(msg.encode('utf-8'))
+    msg = "   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/   \__|_| |_|\___|  |____/|____/____/   |___/\___|_|    \_/ \___|_|  \r\n\r\n"
+    ClientSocket.send(msg.encode('utf-8'))
+    msg = "*************************************************************************************************************************************\r\n"
     ClientSocket.send(msg.encode('utf-8'))
     ClientSocket.recv(1024)
     msg_input = ""  # get out the trash
