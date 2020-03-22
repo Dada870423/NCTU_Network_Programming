@@ -5,7 +5,16 @@ import sqlite3
 from sqlite3 import Error
 
 def Client_Work(ClientSocket, addr):
-    msg = "Welcome to my BBS server\r\n"
+    msg = "************************************************\r\n**   "
+    ClientSocket.send(msg.encode('utf-8'))
+    msg = "Welcome to my BBS server   **\r\n"
+
+
+
+
+
+    ClientSocket.send(msg.encode('utf-8'))
+    msg = "************************************************\r\n"
     ClientSocket.send(msg.encode('utf-8'))
     ClientSocket.recv(1024)
     msg_input = ""  # get out the trash
@@ -78,13 +87,14 @@ def Client_Work(ClientSocket, addr):
                 msg_suc = cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             else:
-                msg_err = "Please login first\r\n"
+                msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
 
         if msg_input == "logout":
             if login > -1:
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,))
                 cursor = cursor.fetchone()
+                login = -1
                 print("I am ", cursor[0], "\r\n")
                 msg_suc = "Bye, " + cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
