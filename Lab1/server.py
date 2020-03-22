@@ -30,11 +30,11 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
                 conn.commit()
                 print("Insertion is success")
-                msg_suc = "Register successfully\r\n"
+                msg_suc = "Register successfully.\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             except Error:
                 print("Username is already used")
-                msg_err = "Username is already used\r\n"
+                msg_err = "Username is already used.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
         elif len(msg_split) == 1:
             if msg_input == "register":
@@ -48,7 +48,7 @@ def Client_Work(ClientSocket, addr):
         
         if len(msg_split) == 3 and msg_split[0] == "login":
             if login > -1:
-                msg_err = "Please logout first\r\n"
+                msg_err = "Please logout first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
             cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],))
@@ -59,7 +59,7 @@ def Client_Work(ClientSocket, addr):
                 msg_suc = "Welcome, " + cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             else: # no such person or password is incorrect
-                msg_err = "Login failed" + "\r\n"
+                msg_err = "Login failed." + "\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
         elif len(msg_split) == 1:
             if msg_input == "login":
