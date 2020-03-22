@@ -95,9 +95,8 @@ def Client_Work(ClientSocket, addr):
 
         if msg_input == "exit":
             print("the client ", login," want to bye")
-            server.shutdown(0)
-            #server.close()
-
+            ClientSocket.close()
+            break
 
 
 
