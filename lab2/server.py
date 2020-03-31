@@ -36,7 +36,7 @@ def Client_Work(ClientSocket, addr):
         msg_input = ClientSocket.recv(1024).decode('utf-8')
         msg_input = msg_input.replace('\n', '').replace('\r', '')
         msg_split = msg_input.split()
-
+################################################################################################## Lab1
         print("msg : ", msg_input, "  len: ", len(msg_split))
         if len(msg_split) == 4 and msg_split[0] == "register":
             try:
@@ -111,6 +111,33 @@ def Client_Work(ClientSocket, addr):
             print("the client ", login," want to bye")
             ClientSocket.close()
             break
+
+################################################################################################### Lab1 done
+        if len(msg_split) == 2 and msg_split[0] == "create-board":
+            if login == 0:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            try:
+                cursor = c.execute('INSERT INTO BOARDS ("BName") VALUES (?) ', msg_split[1])
+                conn.commit()
+                print("Board insertion is success")
+                os.system("mkdir data/{}".format(msg_split[1]))
+                os.system("mkdir data/{}/post".format(msg_split[1]))
+                os.system("mkdir data/{}/comment".format(msg_split[1]))
+                msg_suc = "Create board srccessfully.\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+            except Error:
+                print("Board is already exist")
+                msg_err = "Board is already exist\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+        elif (len(msg_split) == 1 and msg_input == "create-board") or (len(msg_split) > 1 and msg_split[0] == "create-board"):
+            msg_err = "Usage: create-board <Board Name>\r\n"
+            ClientSocket.send(msg_err.encode('utf-8'))
+
+
+
+
 
 
 
