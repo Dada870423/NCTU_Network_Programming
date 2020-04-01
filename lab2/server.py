@@ -116,7 +116,7 @@ def Client_Work(ClientSocket, addr):
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
             try:
-                cursor = c.execute('INSERT INTO BOARDS ("BName", "Moderator_id") VALUES (?, ?) ', (msg_split[1], login))
+                cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (msg_split[1], login))
                 conn.commit()
                 print("Board insertion is success")
                 msg_suc = "Create board srccessfully.\r\n"
