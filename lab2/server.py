@@ -2,6 +2,7 @@ import socket
 import _thread
 import sys
 import sqlite3
+import os
 from sqlite3 import Error
 
 def Client_Work(ClientSocket, addr):
@@ -49,16 +50,13 @@ def Client_Work(ClientSocket, addr):
                 print("Username is already used")
                 msg_err = "Username is already used.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-        elif len(msg_split) == 1:
-            if msg_input == "register":
-                msg_err = "Usage: register <username> <email> <password>\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
-        elif len(msg_split) > 1:
-            if msg_split[0] == "register":
-                msg_err = "Usage: register <username> <email> <password>\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
+            continue
+        elif (msg_input == "register") or (len(msg_split) > 1 and msg_split[0] == "register"):
+            msg_err = "Usage: register <username> <email> <password>\r\n"
+            ClientSocket.send(msg_err.encode('utf-8'))
+            continue
+       
 
-        
         if len(msg_split) == 3 and msg_split[0] == "login":
             if login > -1:
                 msg_err = "Please logout first.\r\n"
@@ -74,25 +72,24 @@ def Client_Work(ClientSocket, addr):
             else: # no such person or password is incorrect
                 msg_err = "Login failed." + "\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-        elif len(msg_split) == 1:
-            if msg_input == "login":
-                msg_err = "Usage: login <username> <password>\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
-        elif len(msg_split) > 1:
-            if msg_split[0] == "login":
-                msg_err = "Usage: login <username> <password>\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
+            continue
+        elif (len(msg_split) > 1 and msg_split[0] == "login") or (msg_input == "login"):
+            msg_err = "Usage: login <username> <password>\r\n"
+            ClientSocket.send(msg_err.encode('utf-8'))
+            continue
 
         if msg_input == "whoami":
             if login > -1:
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,))
                 cursor = cursor.fetchone()
-                print("I am ", cursor[0], "\r\n")
+                print("I am ", cursor[0])
                 msg_suc = cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             else:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
+                print("He didn't login")
+            continue
 
         if msg_input == "logout":
             if login > -1:
@@ -105,7 +102,7 @@ def Client_Work(ClientSocket, addr):
             else:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-
+            continue
 
         if msg_input == "exit":
             print("the client ", login," want to bye")
@@ -114,34 +111,48 @@ def Client_Work(ClientSocket, addr):
 
 ################################################################################################### Lab1 done
         if len(msg_split) == 2 and msg_split[0] == "create-board":
-            if login == 0:
+            if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
             try:
-                cursor = c.execute('INSERT INTO BOARDS ("BName") VALUES (?) ', msg_split[1])
+                cursor = c.execute('INSERT INTO BOARDS ("BName") VALUES (?) ', (msg_split[1], ))
                 conn.commit()
                 print("Board insertion is success")
-                os.system("mkdir data/{}".format(msg_split[1]))
-                os.system("mkdir data/{}/post".format(msg_split[1]))
-                os.system("mkdir data/{}/comment".format(msg_split[1]))
                 msg_suc = "Create board srccessfully.\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             except Error:
                 print("Board is already exist")
                 msg_err = "Board is already exist\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
+            continue
         elif (len(msg_split) == 1 and msg_input == "create-board") or (len(msg_split) > 1 and msg_split[0] == "create-board"):
             msg_err = "Usage: create-board <Board Name>\r\n"
             ClientSocket.send(msg_err.encode('utf-8'))
+            continue
 
+#        if len(msg_split) == 2 and msg_split[0] == "list-board":
+#            if login == -1:
+#                msg_err = "Please login first.\r\n"
+#                ClientSocket.send(msg_err.encode('utf-8'))
+#                continue
+#            try:
+#                srch_board = "%" + msg_split[1] + "%"
+#                cursor = c.execute('SELECT * FROM BOARDS WHERE BName LIKE ? ', srch_board)
+#                crusor = cursor.fetchome()
+#                print(cursor[0])
+#            except Error:
+#                msg_err = "Board is not exist.\r\n"
+#                ClientSocket.send(msg_err.encode('utf-8'))
+#        elif len(msg_split) == 1 and msg_input == "list-board":
+#            cursor = c.execute('SELECT * FROM BOARDS')
+#            cursor = cursor.fetchone()
+#            if cursor != None:
+#                print(cursor[0])
 
-
-
-
-
-
-
+        
+        msg_err = "Command not found\r\n"
+        ClientSocket.send(msg_err.encode('utf-8'))
 
 
 bind_ip = "0.0.0.0"
