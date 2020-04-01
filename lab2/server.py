@@ -130,12 +130,20 @@ def Client_Work(ClientSocket, addr):
             msg_err = "Usage: create-board <Board Name>\r\n"
             ClientSocket.send(msg_err.encode('utf-8'))
             continue
-
-        if len(msg_split) == 2 and msg_split[0] == "list-board":
+## Create board done
+## To list the board
+        if len(msg_split) == 2 and msg_split[0] == "list-board": ## with keyword
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
+            hashtag = "##"
+            if hashtag in msg_split[1]:
+            	msg_split[1] = msg_split[1].replace("##", "")
+            else:
+            	msg_err = "Use ## to search keyword.\r\n"
+            	ClientSocket.send(msg_err.encode('utf-8'))
+            	continue
             srch_board = "%" + msg_split[1] + "%"
             cursor = c.execute("SELECT * FROM BOARDS WHERE BName LIKE ?", (srch_board, ))
             cursor = cursor.fetchone()
@@ -144,17 +152,15 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "No keyword board yet.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-
             msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
             ClientSocket.send(msg_suc.encode('utf-8'))
-
             for row in c.execute("SELECT * FROM BOARDS WHERE BName LIKE ?", (srch_board, )):
                 print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                 msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                 ClientSocket.send(msg_suc.encode('utf-8'))
             continue
 
-        elif msg_input == "list-board":
+        elif msg_input == "list-board": ## without keyword
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
@@ -166,7 +172,6 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "There is not any board yet.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-
             msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
             ClientSocket.send(msg_suc.encode('utf-8'))
             for row in c.execute("SELECT * FROM BOARDS"):
@@ -175,6 +180,7 @@ def Client_Work(ClientSocket, addr):
                 ClientSocket.send(msg_suc.encode('utf-8'))
             continue
 
+## Command not found
         if msg_input != "":
             msg_err = "Command not found\r\n"
             ClientSocket.send(msg_err.encode('utf-8'))
