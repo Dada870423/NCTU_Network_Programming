@@ -114,7 +114,6 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-                cursor = c.execute('INSERT INTO BOARDS ("BName", "Moderator_id") VALUES (?, ?) ', (msg_split[1], login))
                 continue
             try:
                 cursor = c.execute('INSERT INTO BOARDS ("BName", "Moderator_id") VALUES (?, ?) ', (msg_split[1], login))
@@ -137,22 +136,48 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-            try:
-                srch_board = "%" + msg_split[1] + "%"
-                cursor = c.execute('SELECT * FROM BOARDS WHERE BName LIKE ? ', srch_board)
-                crusor = cursor.fetchome()
-                print(cursor[0])
-            except Error:
-                msg_err = "Board is not exist.\r\n"
+            srch_board = "%" + msg_split[1] + "%"
+            cursor = c.execute("SELECT * FROM BOARDS WHERE BName LIKE ?", (srch_board, ))
+            cursor = cursor.fetchone()
+            print(cursor)
+            if cursor == None:
+                msg_err = "No keyword board yet.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+
+            msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+            ClientSocket.send(msg_suc.encode('utf-8'))
+
+            for row in c.execute("SELECT * FROM BOARDS WHERE BName LIKE ?", (srch_board, )):
+                print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
+                msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                ClientSocket.send(msg_suc.encode('utf-8'))
+            continue
+
         elif msg_input == "list-board":
-            print("{:^5} {:^20} {:^20} ".format("Index", "Name", "Moderator"))
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            cursor = c.execute("SELECT * FROM BOARDS")
+            cursor = cursor.fetchone()
+            print(cursor)
+            if cursor == None:
+                msg_err = "There is not any board yet.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+
+            msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+            ClientSocket.send(msg_suc.encode('utf-8'))
             for row in c.execute("SELECT * FROM BOARDS"):
                 print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
+                msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                ClientSocket.send(msg_suc.encode('utf-8'))
+            continue
 
-        
-        msg_err = "Command not found\r\n"
-        ClientSocket.send(msg_err.encode('utf-8'))
+        if msg_input != "":
+            msg_err = "Command not found\r\n"
+            ClientSocket.send(msg_err.encode('utf-8'))
 
 
 bind_ip = "0.0.0.0"
