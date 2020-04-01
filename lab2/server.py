@@ -114,9 +114,10 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
+                cursor = c.execute('INSERT INTO BOARDS ("BName", "Moderator_id") VALUES (?, ?) ', (msg_split[1], login))
                 continue
             try:
-                cursor = c.execute('INSERT INTO BOARDS ("BName") VALUES (?) ', (msg_split[1], ))
+                cursor = c.execute('INSERT INTO BOARDS ("BName", "Moderator_id") VALUES (?, ?) ', (msg_split[1], login))
                 conn.commit()
                 print("Board insertion is success")
                 msg_suc = "Create board srccessfully.\r\n"
@@ -131,24 +132,23 @@ def Client_Work(ClientSocket, addr):
             ClientSocket.send(msg_err.encode('utf-8'))
             continue
 
-#        if len(msg_split) == 2 and msg_split[0] == "list-board":
-#            if login == -1:
-#                msg_err = "Please login first.\r\n"
-#                ClientSocket.send(msg_err.encode('utf-8'))
-#                continue
-#            try:
-#                srch_board = "%" + msg_split[1] + "%"
-#                cursor = c.execute('SELECT * FROM BOARDS WHERE BName LIKE ? ', srch_board)
-#                crusor = cursor.fetchome()
-#                print(cursor[0])
-#            except Error:
-#                msg_err = "Board is not exist.\r\n"
-#                ClientSocket.send(msg_err.encode('utf-8'))
-#        elif len(msg_split) == 1 and msg_input == "list-board":
-#            cursor = c.execute('SELECT * FROM BOARDS')
-#            cursor = cursor.fetchone()
-#            if cursor != None:
-#                print(cursor[0])
+        if len(msg_split) == 2 and msg_split[0] == "list-board":
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            try:
+                srch_board = "%" + msg_split[1] + "%"
+                cursor = c.execute('SELECT * FROM BOARDS WHERE BName LIKE ? ', srch_board)
+                crusor = cursor.fetchome()
+                print(cursor[0])
+            except Error:
+                msg_err = "Board is not exist.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+        elif msg_input == "list-board":
+            print("{:^5} {:^20} {:^20} ".format("Index", "Name", "Moderator"))
+            for row in c.execute("SELECT * FROM BOARDS"):
+                print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
 
         
         msg_err = "Command not found\r\n"
