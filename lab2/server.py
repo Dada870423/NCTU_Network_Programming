@@ -80,12 +80,11 @@ def Client_Work(ClientSocket, addr):
                 print("I am ", cursor[0])
                 msg_suc = cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
-                continue
             else:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 print("He didn't login")
-                continue
+            continue
 
         if msg_input == "logout":
             if login > -1:
@@ -95,11 +94,10 @@ def Client_Work(ClientSocket, addr):
                 print("Bye from ", cursor[0], "\r\n")
                 msg_suc = "Bye, " + cursor[1] + "\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
-                continue
             else:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-                continue
+            continue
 
         if msg_input == "exit":
             print("the client ", login," want to bye")
@@ -171,7 +169,40 @@ def Client_Work(ClientSocket, addr):
                 continue
 
 ## create the post
-		##if msg_input.startswith("create-post") 
+        if msg_input.startswith("create-post"):                             
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue                                                    ## Bname = BoardTitle[0]
+            elif len(msg_split) > 5:                                        ## Title = TitleContent[0]
+                no_create = msg_input.replace("create-post ", "")           ## Content = TitleContent[1]
+                BoardTitle = no_create.split(" --title ")
+                TitleContent = BoardTitle[1].split(" --content ")
+                print("Board name is : ", BoardTitle[0], "Title is : ", TitleContent[0], "Content is : ", TitleContent[1])
+                cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BoardTitle[0],))
+                cursor = cursor.fetchone()
+                if cursor != None: #Board is exist
+                    print("Board exist")
+                else:
+                    print("Board is not exist")
+                    msg_err = "Board is not exist.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Command not found
