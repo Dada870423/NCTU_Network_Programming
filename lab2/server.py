@@ -1,6 +1,7 @@
 import socket
 import _thread
 import sys
+import time
 import sqlite3
 import os
 from sqlite3 import Error
@@ -26,7 +27,8 @@ def Client_Work(ClientSocket, addr):
     
     login = -1 ## check login or not and whoami
     hashtag = "##"
-
+    TITLE = " --title "
+    CONTENT = " --content "
     conn = sqlite3.connect('BBS.db')
     print("opened databases successfully")
     c = conn.cursor()
@@ -45,7 +47,7 @@ def Client_Work(ClientSocket, addr):
                 try:
                     cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
                     conn.commit()
-                    print("Insertion is success")
+                    print("USER insertion is success")
                     msg_suc = "Register successfully.\r\n"
                     ClientSocket.send(msg_suc.encode('utf-8'))
                 except Error:
@@ -173,11 +175,16 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
-                continue                                                    ## Bname = BoardTitle[0]
-            elif len(msg_split) > 5:                                        ## Title = TitleContent[0]
-                no_create = msg_input.replace("create-post ", "")           ## Content = TitleContent[1]
-                BoardTitle = no_create.split(" --title ")
-                TitleContent = BoardTitle[1].split(" --content ")
+                continue
+            elif len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
+                no_create = msg_input.replace("create-post ", "")           ## Bname = BoardTitle[0]
+                if no_create.startswith("--title"):
+                    print("He did not choose the board")
+                    msg_err = "Please choose a board.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                    continue
+                BoardTitle = no_create.split(" --title ")                   ## Title = TitleContent[0]
+                TitleContent = BoardTitle[1].split(" --content ")           ## Content = TitleContent[1]
                 print("Board name is : ", BoardTitle[0], "Title is : ", TitleContent[0], "Content is : ", TitleContent[1])
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BoardTitle[0],))
                 cursor = cursor.fetchone()
@@ -187,10 +194,42 @@ def Client_Work(ClientSocket, addr):
                     print("Board is not exist")
                     msg_err = "Board is not exist.\r\n"
                     ClientSocket.send(msg_err.encode('utf-8'))
+                    continue
+                
+                NowTime = time.strftime("%Y/%m/%d", time.localtime()) ## is a string
+                print(NowTime, type(NowTime))
+                cursor = c.execute('INSERT INTO POSTS ("TITLE", "UID", "DT") VALUES (?, ?, ?)', (TitleContent[0], login, NowTime))
+                conn.commit()
+                print("POST insertion is success")
+                msg_suc = "CREATE POST successfully.\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+                DIR = 'data/post'
+                P_num = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) 
+                
+                cnt = TitleContent[1].split("<br>")
+                for iter_cnt in cnt:
+                    print(iter_cnt)
+                    os.system("echo {} >> data/post/{}".format(iter_cnt, P_num+1))
+                
+
+
+
                 continue
 
 
 
+
+
+#CREATE TABLE BOARDS(
+#BID INTEGER PRIMARY KEY AUTOINCREMENT,
+#BName TEXT NOT NULL UNIQUE,
+#UID INTEGER);
+
+#CREATE TABLE POSTS(
+#PID INTEGER PRIMARY KEY AUTOINCREMENT,
+#TITLE TEXT NOT NULL,
+#UID INTEGER,
+#DT TEXT);
 
 
 
@@ -240,7 +279,7 @@ def Client_Work(ClientSocket, addr):
 
 
 
-
+P_num = 1
 
 bind_ip = "0.0.0.0"
 bind_port = 3110
