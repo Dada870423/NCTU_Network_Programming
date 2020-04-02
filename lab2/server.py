@@ -25,7 +25,7 @@ def Client_Work(ClientSocket, addr):
     msg_input = ""  # get out the trash
     
     login = -1 ## check login or not and whoami
-
+    hashtag = "##"
 
     conn = sqlite3.connect('BBS.db')
     print("opened databases successfully")
@@ -52,9 +52,6 @@ def Client_Work(ClientSocket, addr):
                     print("Username is already used")
                     msg_err = "Username is already used.\r\n"
                     ClientSocket.send(msg_err.encode('utf-8'))
-            #else:
-            #    msg_err = "Usage: register <username> <email> <password>\r\n"
-            #    ClientSocket.send(msg_err.encode('utf-8'))
                 continue
        
 
@@ -74,9 +71,6 @@ def Client_Work(ClientSocket, addr):
                 else: # no such person or password is incorrect
                     msg_err = "Login failed." + "\r\n"
                     ClientSocket.send(msg_err.encode('utf-8'))
-            #else:
-            #    msg_err = "Usage: login <username> <password>\r\n"
-            #    ClientSocket.send(msg_err.encode('utf-8'))
                 continue
 
         if msg_input == "whoami":
@@ -131,61 +125,50 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Board is already exist\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-            #else:
-            #    msg_err = "Usage: create-board <Board Name>\r\n"
-            #    ClientSocket.send(msg_err.encode('utf-8'))
+
             
 ## Create board done
 ## To list the board
-        if len(msg_split) == 2 and msg_split[0] == "list-board": ## with keyword
+        if msg_input.startswith("list-board"): 
+            HBName = msg_input.replace("list-board", "")
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-            hashtag = "##"
-            if hashtag in msg_split[1]:
-            	msg_split[1] = msg_split[1].replace("##", "")
-            else:
-            	msg_err = "Use ## to search keyword.\r\n"
-            	ClientSocket.send(msg_err.encode('utf-8'))
-            	continue
-            srch_board = "%" + msg_split[1] + "%"
-            cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (srch_board, ))
-            cursor = cursor.fetchone()
-            
-            if cursor == None:
-                print(cursor)	
-                msg_err = "No keyword board yet.\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
-                continue
-            msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-            ClientSocket.send(msg_suc.encode('utf-8'))
-            ## for row in c.execute("SELECT * FROM BOARDS WHERE BName LIKE ?", (srch_board, )):
-            for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (srch_board, )):
-                print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+            elif msg_input == "list-board": ## without keyword
+                cursor = c.execute("SELECT * FROM BOARDS")
+                cursor = cursor.fetchone()
+                if cursor == None:
+                    print(cursor)
+                    msg_err = "There is not any board yet.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                else:
+                    msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+                    ClientSocket.send(msg_suc.encode('utf-8'))
+                    for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
+                        print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
+                        msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        ClientSocket.send(msg_suc.encode('utf-8'))
+                continue    
+            elif hashtag in HBName: ## with keyword
+                BName = HBName.replace(" ##", "")
+                BName = "%" + BName + "%"
+                cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, ))
+                cursor = cursor.fetchone()
+	            
+                if cursor == None:
+                    print(cursor)	
+                    msg_err = "No keyword board yet.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                    continue
+                msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
                 ClientSocket.send(msg_suc.encode('utf-8'))
-            continue
-
-        elif msg_input == "list-board": ## without keyword
-            if login == -1:
-                msg_err = "Please login first.\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
+                ## for row in c.execute("SELECT * FROM BOARDS WHERE BName LIKE ?", (srch_board, )):
+                for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
+                    print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
+                    msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                    ClientSocket.send(msg_suc.encode('utf-8'))
                 continue
-            cursor = c.execute("SELECT * FROM BOARDS")
-            cursor = cursor.fetchone()
-            print(cursor)
-            if cursor == None:
-                msg_err = "There is not any board yet.\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
-                continue
-            msg_suc = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-            ClientSocket.send(msg_suc.encode('utf-8'))
-            for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
-                print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                msg_suc = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
-                ClientSocket.send(msg_suc.encode('utf-8'))
-            continue
 
 ## create the post
 		##if msg_input.startswith("create-post") 
@@ -205,7 +188,10 @@ def Client_Work(ClientSocket, addr):
         elif msg_input.startswith("create-board"):
             msg_err = "Usage: create-board <Board Name>\r\n"
         elif msg_input.startswith("list-board"):
-            msg_err = "Usage: list-board or list-board ##<keyword>\r\n"
+            if hashtag in msg_input:
+                msg_err = "Usage: list-board ##<keyword>\r\n"
+            else:
+                msg_err = "Usage: list-board\r\n"
         elif msg_input != "":
             msg_err = "Command not found\r\n"
         
