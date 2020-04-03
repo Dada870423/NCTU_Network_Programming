@@ -219,7 +219,7 @@ def Client_Work(ClientSocket, addr):
                 continue
 
 
-
+## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "")
             if login == -1:
@@ -280,18 +280,43 @@ def Client_Work(ClientSocket, addr):
                             print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                             msg_suc = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
                             ClientSocket.send(msg_suc.encode('utf-8'))
-
-
             continue
 
 
 
-
-
-
-
-
-
+        if len(msg_split) == 2 and msg_split[0] == "read":
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = cursor.fetchone()
+            if cursor == None:
+                print(cursor, "Post is not exist.")
+                msg_err = "Post is not exist.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            else:
+                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], ))
+                cursor = cursor.fetchone()
+                print(cursor[0], cursor[1], cursor[2])
+                msg_suc = "Author : {:^20} \r\nTitle : {:^20} \r\nDate : {:^20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                ClientSocket.send(msg_suc.encode('utf-8'))
+                PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
+                Rcontent = PostPtr.readlines()
+                for i in range(len(Rcontent)):
+                    msg_suc = Rcontent[i] + "\r"
+                    ClientSocket.send(msg_suc.encode('utf-8'))
+                msg_suc = "--\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+                CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
+                Rcomment = CommentPtr.readlines()
+                for i in range(len(Rcomment)):
+                    msg_suc = Rcomment[i] + "\r"
+                    ClientSocket.send(msg_suc.encode('utf-8'))
+                msg_suc = "\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+                continue
 
 
 
@@ -323,6 +348,8 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Usage: list-post <Board Name> ##<keyword>\r\n"
             else:
                 msg_err = "Usage: list-post <Board Name>\r\n"
+        elif msg_input.startswith("reard"):
+            msg_err = "Usage: read <Post ID>\r\n"
         elif msg_input != "":
             msg_err = "Command not found\r\n"
         
