@@ -170,7 +170,7 @@ def Client_Work(ClientSocket, addr):
                     ClientSocket.send(msg_suc.encode('utf-8'))
                 continue
 
-## create the post
+## create the post & file of comment
         if msg_input.startswith("create-post"):                             
             if login == -1:
                 msg_err = "Please login first.\r\n"
@@ -198,7 +198,7 @@ def Client_Work(ClientSocket, addr):
                 
                 NowTime = time.strftime("%Y/%m/%d", time.localtime()) ## is a string
                 print(NowTime, type(NowTime))
-                cursor = c.execute('INSERT INTO POSTS ("TITLE", "UID", "DT") VALUES (?, ?, ?)', (TitleContent[0], login, NowTime))
+                cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
                 conn.commit()
                 print("POST insertion is success")
                 msg_suc = "CREATE POST successfully.\r\n"
@@ -207,29 +207,43 @@ def Client_Work(ClientSocket, addr):
                 P_num = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) 
                 
                 cnt = TitleContent[1].split("<br>")
+                os.system("echo "" >> data/comment/{}".format(P_num+1))
                 for iter_cnt in cnt:
                     print(iter_cnt)
                     os.system("echo {} >> data/post/{}".format(iter_cnt, P_num+1))
-                
-
-
-
                 continue
 
 
 
+        if msg_input.startswith("list-post"): 
+            BName = msg_input.replace("list-post ", "")
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            elif len(msg_split) > 1 and hashtag in BName: ## with keyword
+                continue
+            elif len(msg_split) > 1:                      ## without keyword
+                print("Want to search in ", BName, " Board")
+                cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,))
+                cursor = cursor.fetchone()
+                if cursor == None:                        ## Board is not exist
+                    print("Board is not exist")
+                    msg_err = "Board is not exist.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                    continue
+                else:
+                    print("Board is exist")
+                    msg_suc = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+                    ClientSocket.send(msg_suc.encode('utf-8'))
+                    for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
+                        print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
+                        msg_suc = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                        ClientSocket.send(msg_suc.encode('utf-8'))
 
 
-#CREATE TABLE BOARDS(
-#BID INTEGER PRIMARY KEY AUTOINCREMENT,
-#BName TEXT NOT NULL UNIQUE,
-#UID INTEGER);
+                continue
 
-#CREATE TABLE POSTS(
-#PID INTEGER PRIMARY KEY AUTOINCREMENT,
-#TITLE TEXT NOT NULL,
-#UID INTEGER,
-#DT TEXT);
 
 
 
@@ -262,6 +276,13 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Usage: list-board ##<keyword>\r\n"
             else:
                 msg_err = "Usage: list-board\r\n"
+        elif msg_input.startswith("create-post"):
+            msg_err = "Usage: create-post <Board Name> --title <title> --content <content>\r\n"
+        elif msg_input.startswith("list-post"):
+            if hashtag in msg_input:
+                msg_err = "Usage: list-post <Board Name> ##<keyword>\r\n"
+            else:
+                msg_err = "Usage: list-post <Board Name>\r\n"
         elif msg_input != "":
             msg_err = "Command not found\r\n"
         
@@ -270,7 +291,17 @@ def Client_Work(ClientSocket, addr):
 
 
 
+#CREATE TABLE BOARDS(
+#BID INTEGER PRIMARY KEY AUTOINCREMENT,
+#BName TEXT NOT NULL UNIQUE,
+#UID INTEGER);
 
+#CREATE TABLE POSTS(
+#PID INTEGER PRIMARY KEY AUTOINCREMENT,
+#TITLE TEXT NOT NULL,
+#BName TEXT,
+#UID INTEGER,
+#DT TEXT);
 
 
 
