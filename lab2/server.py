@@ -301,7 +301,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], ))
                 cursor = cursor.fetchone()
                 print(cursor[0], cursor[1], cursor[2])
-                msg_suc = "Author : {:>20} \r\nTitle : {:>20} \r\nDate : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                msg_suc = "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
                 ClientSocket.send(msg_suc.encode('utf-8'))
                 PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
                 Rcontent = PostPtr.readlines()
