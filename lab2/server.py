@@ -301,7 +301,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], ))
                 cursor = cursor.fetchone()
                 print(cursor[0], cursor[1], cursor[2])
-                msg_suc = "Author : {:^20} \r\nTitle : {:^20} \r\nDate : {:^20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                msg_suc = "Author : {:>20} \r\nTitle : {:>20} \r\nDate : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
                 ClientSocket.send(msg_suc.encode('utf-8'))
                 PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
                 Rcontent = PostPtr.readlines()
@@ -402,14 +402,10 @@ def Client_Work(ClientSocket, addr):
                 starts = "comment " + msg_split[1] + " "
                 Ccomment = msg_input.replace(starts, "", 1)
                 print("I am ", Cname, "and i want to comment", Ccomment, "in", msg_split[1])
-                os.system("echo {} : {} >> data/comment/{}".format(Cname, Ccomment, msg_split[1]))
+                os.system("echo {:<20} : {:<20} >> data/comment/{}".format(Cname, Ccomment, msg_split[1]))
                 msg_suc = "Comment successfully.\r\n"
                 ClientSocket.send(msg_suc.encode('utf-8'))
             continue
-
-
-
-
 
 ## Command not found
         if msg_input.startswith("register"):
@@ -472,13 +468,6 @@ def Client_Work(ClientSocket, addr):
 #DT TEXT);
 
 
-
-
-
-
-
-
-P_num = 1
 
 bind_ip = "0.0.0.0"
 bind_port = 3110
