@@ -343,8 +343,32 @@ def Client_Work(ClientSocket, addr):
                 ClientSocket.send(msg_err.encode('utf-8'))
             continue
 
-
-
+## update the post
+        if msg_input.startswith("update-post ") and len(msg_split) > 2:
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = cursor.fetchone()
+            if cursor == None:
+                print(cursor, "Post is not exist.")
+                msg_err = "Post is not exist.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            elif cursor[3] != login:
+                print("Owner is:",  cursor[3])
+                msg_err = "Not the post owner.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            if msg_split[2] == "--title":
+                UTitle = msg_input.split(" --title ") 
+                print("I want to update the title, and the new title is:", UTitle[1])	
+                continue
+            elif msg_split[2] == "--content":
+                UContent = msg_input.split(" --content ") 
+                print("I want to update the content, and the new content is:", UContent[1])
+                continue
 
 
 
@@ -384,6 +408,8 @@ def Client_Work(ClientSocket, addr):
             msg_err = "Usage: read <Post ID>\r\n"
         elif msg_input.startswith("delete-post"):
             msg_err = "Usage: delete-post <Post ID>\r\n"
+        elif msg_input.startswith("update-post"):
+            msg_err = "Usage: update-post <Post ID> --title/--content <NEW>\r\n"        
         elif msg_input != "":
             msg_err = "Command not found\r\n"
         
