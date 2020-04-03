@@ -112,7 +112,7 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-            BName = msg_input.replace("create-board ", "")
+            BName = msg_input.replace("create-board ", "", 1)
             try:
                 cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
                 conn.commit()
@@ -130,7 +130,7 @@ def Client_Work(ClientSocket, addr):
 ## Create board done
 ## To list the board
         if msg_input.startswith("list-board"): 
-            HBName = msg_input.replace("list-board", "")
+            HBName = msg_input.replace("list-board", "", 1)
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
@@ -151,7 +151,7 @@ def Client_Work(ClientSocket, addr):
                         ClientSocket.send(msg_suc.encode('utf-8'))
                 continue    
             elif hashtag in HBName: ## with keyword
-                BName = HBName.replace(" ##", "")
+                BName = HBName.replace(" ##", "", 1)
                 BName = "%" + BName + "%"
                 cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, ))
                 cursor = cursor.fetchone()
@@ -177,7 +177,7 @@ def Client_Work(ClientSocket, addr):
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
             elif len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
-                no_create = msg_input.replace("create-post ", "")           ## Bname = BoardTitle[0]
+                no_create = msg_input.replace("create-post ", "", 1)           ## Bname = BoardTitle[0]
                 if msg_split[1] == "--title":
                     print("He did not choose the board")
                     msg_err = "Please choose a board.\r\n"
@@ -221,7 +221,7 @@ def Client_Work(ClientSocket, addr):
 
 ## list the post with ## or not
         if msg_input.startswith("list-post "): 
-            BName = msg_input.replace("list-post ", "")
+            BName = msg_input.replace("list-post ", "", 1)
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
@@ -231,6 +231,7 @@ def Client_Work(ClientSocket, addr):
                     print("He did not choose the board")
                     msg_err = "Please choose a board.\r\n"
                     ClientSocket.send(msg_err.encode('utf-8'))
+                    continue
                 BNameKey = BName.split(" ##")
                 BName = BNameKey[0]
                 keyword = "%" + BNameKey[1] + "%"
@@ -283,7 +284,7 @@ def Client_Work(ClientSocket, addr):
             continue
 
 
-
+## read post and read comment
         if len(msg_split) == 2 and msg_split[0] == "read":
             if login == -1:
                 msg_err = "Please login first.\r\n"
@@ -318,6 +319,37 @@ def Client_Work(ClientSocket, addr):
                 ClientSocket.send(msg_suc.encode('utf-8'))
                 continue
 
+## delete the post
+        if len(msg_split) == 2 and msg_split[0] == "delete-post":
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = cursor.fetchone()
+            if cursor == None:
+                print(cursor, "Post is not exist.")
+                msg_err = "Post is not exist.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+            elif cursor[3] != login:
+                print("Owner is:",  cursor[3])
+                msg_err = "Not the post owner.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+            else:
+                cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
+                conn.commit()
+                print("POST delete is success")
+                msg_err = "Delete successfully.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+            continue
+
+
+
+
+
+
+
+
 
 
 
@@ -348,8 +380,10 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Usage: list-post <Board Name> ##<keyword>\r\n"
             else:
                 msg_err = "Usage: list-post <Board Name>\r\n"
-        elif msg_input.startswith("reard"):
+        elif msg_input.startswith("read"):
             msg_err = "Usage: read <Post ID>\r\n"
+        elif msg_input.startswith("delete-post"):
+            msg_err = "Usage: delete-post <Post ID>\r\n"
         elif msg_input != "":
             msg_err = "Command not found\r\n"
         
