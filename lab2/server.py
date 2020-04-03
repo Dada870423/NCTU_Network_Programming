@@ -248,7 +248,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = cursor.fetchone()
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
-                        msg_err = "There is not any board yet.\r\n"
+                        msg_err = "There is not any post in this board yet.\r\n"
                         ClientSocket.send(msg_err.encode('utf-8'))
                     else:
                         msg_suc = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
@@ -272,7 +272,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = cursor.fetchone()
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
-                        msg_err = "There is not any board yet.\r\n"
+                        msg_err = "There is not any post in this board yet.\r\n"
                         ClientSocket.send(msg_err.encode('utf-8'))
                     else:
                         msg_suc = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
@@ -308,7 +308,7 @@ def Client_Work(ClientSocket, addr):
                 for i in range(len(Rcontent)):
                     msg_suc = Rcontent[i] + "\r"
                     ClientSocket.send(msg_suc.encode('utf-8'))
-                msg_suc = "--\r\n"
+                msg_suc = "--"
                 ClientSocket.send(msg_suc.encode('utf-8'))
                 CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
                 Rcomment = CommentPtr.readlines()
@@ -339,8 +339,8 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
                 conn.commit()
                 print("POST delete is success")
-                msg_err = "Delete successfully.\r\n"
-                ClientSocket.send(msg_err.encode('utf-8'))
+                msg_suc = "Delete successfully.\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
             continue
 
 ## update the post
@@ -364,16 +364,48 @@ def Client_Work(ClientSocket, addr):
             if msg_split[2] == "--title":
                 UTitle = msg_input.split(" --title ") 
                 print("I want to update the title, and the new title is:", UTitle[1])	
+                cursor = c.execute('UPDATE POSTS SET TITLE = ? WHERE PID = ?', (UTitle[1], msg_split[1]))
+                conn.commit()
+                msg_suc = "Update successfully.\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
                 continue
             elif msg_split[2] == "--content":
                 UContent = msg_input.split(" --content ") 
                 print("I want to update the content, and the new content is:", UContent[1])
+                cnt = UContent[1].split("<br>")
+                os.system("rm data/post/{}".format(msg_split[1]))
+                for iter_cnt in cnt:
+                    print(iter_cnt)
+                    os.system("echo {} >> data/post/{}".format(iter_cnt, msg_split[1]))
+                msg_suc = "Update successfully.\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+
                 continue
 
 
-
-
-
+## comment
+        if msg_input.startswith("comment ") and len(msg_split) > 1:
+            if login == -1:
+                msg_err = "Please login first.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+                continue
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = cursor.fetchone()
+            if cursor == None:
+                print(cursor, "Post is not exist.")
+                msg_err = "Post is not exist.\r\n"
+                ClientSocket.send(msg_err.encode('utf-8'))
+            else:
+                cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,))
+                cursor = cursor.fetchone()
+                Cname = cursor[1]
+                starts = "comment " + msg_split[1] + " "
+                Ccomment = msg_input.replace(starts, "", 1)
+                print("I am ", Cname, "and i want to comment", Ccomment, "in", msg_split[1])
+                os.system("echo {} : {} >> data/comment/{}".format(Cname, Ccomment, msg_split[1]))
+                msg_suc = "Comment successfully.\r\n"
+                ClientSocket.send(msg_suc.encode('utf-8'))
+            continue
 
 
 
@@ -410,6 +442,8 @@ def Client_Work(ClientSocket, addr):
             msg_err = "Usage: delete-post <Post ID>\r\n"
         elif msg_input.startswith("update-post"):
             msg_err = "Usage: update-post <Post ID> --title/--content <NEW>\r\n"        
+        elif msg_input.startswith("comment"):
+            msg_err = "Usage: comment <Post ID> <Comment>\r\n" 
         elif msg_input != "":
             msg_err = "Command not found\r\n"
         
@@ -417,6 +451,13 @@ def Client_Work(ClientSocket, addr):
             ClientSocket.send(msg_err.encode('utf-8'))
 
 
+
+#CREATE TABLE USERS(
+# UID INTEGER PRIMARY KEY AUTOINCREMENT,
+# Username TEXT NOT NULL UNIQUE,
+# Email TEXT NOT NULL,
+# Password TEXT NOT NULL
+#);
 
 #CREATE TABLE BOARDS(
 #BID INTEGER PRIMARY KEY AUTOINCREMENT,
