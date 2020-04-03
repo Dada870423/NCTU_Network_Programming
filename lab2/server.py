@@ -178,9 +178,14 @@ def Client_Work(ClientSocket, addr):
                 continue
             elif len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
                 no_create = msg_input.replace("create-post ", "")           ## Bname = BoardTitle[0]
-                if no_create.startswith("--title"):
+                if msg_split[1] == "--title":
                     print("He did not choose the board")
                     msg_err = "Please choose a board.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                    continue
+                if msg_split[3] == "--content":
+                    print("He did not name the title")
+                    msg_err = "Please name the title.\r\n"
                     ClientSocket.send(msg_err.encode('utf-8'))
                     continue
                 BoardTitle = no_create.split(" --title ")                   ## Title = TitleContent[0]
@@ -215,15 +220,44 @@ def Client_Work(ClientSocket, addr):
 
 
 
-        if msg_input.startswith("list-post"): 
+        if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "")
             if login == -1:
                 msg_err = "Please login first.\r\n"
                 ClientSocket.send(msg_err.encode('utf-8'))
                 continue
-            elif len(msg_split) > 1 and hashtag in BName: ## with keyword
-                continue
-            elif len(msg_split) > 1:                      ## without keyword
+            elif hashtag in BName: ## with keyword
+                if msg_split[1].startswith("##"):
+                    print("He did not choose the board")
+                    msg_err = "Please choose a board.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                BNameKey = BName.split(" ##")
+                BName = BNameKey[0]
+                keyword = "%" + BNameKey[1] + "%"
+                print("Bname is :", BName, "keyword is :", keyword)
+                cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,))
+                cursor = cursor.fetchone()
+                if cursor == None:                        ## Board is not exist
+                    print("Board is not exist")
+                    msg_err = "Board is not exist.\r\n"
+                    ClientSocket.send(msg_err.encode('utf-8'))
+                else:
+                    print("Board is exist")
+                    cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword))
+                    cursor = cursor.fetchone()
+                    if cursor == None:  ## there is not any post in this board 
+                        print(cursor)
+                        msg_err = "There is not any board yet.\r\n"
+                        ClientSocket.send(msg_err.encode('utf-8'))
+                    else:
+                        msg_suc = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+                        ClientSocket.send(msg_suc.encode('utf-8'))
+                        for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
+                            print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
+                            msg_suc = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                            ClientSocket.send(msg_suc.encode('utf-8'))
+
+            else:                      ## without keyword
                 print("Want to search in ", BName, " Board")
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,))
                 cursor = cursor.fetchone()
@@ -231,18 +265,24 @@ def Client_Work(ClientSocket, addr):
                     print("Board is not exist")
                     msg_err = "Board is not exist.\r\n"
                     ClientSocket.send(msg_err.encode('utf-8'))
-                    continue
                 else:
                     print("Board is exist")
-                    msg_suc = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                    ClientSocket.send(msg_suc.encode('utf-8'))
-                    for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
-                        print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
-                        msg_suc = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                    cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, ))
+                    cursor = cursor.fetchone()
+                    if cursor == None:  ## there is not any post in this board 
+                        print(cursor)
+                        msg_err = "There is not any board yet.\r\n"
+                        ClientSocket.send(msg_err.encode('utf-8'))
+                    else:
+                        msg_suc = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
                         ClientSocket.send(msg_suc.encode('utf-8'))
+                        for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
+                            print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
+                            msg_suc = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                            ClientSocket.send(msg_suc.encode('utf-8'))
 
 
-                continue
+            continue
 
 
 
