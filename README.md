@@ -1,14 +1,29 @@
-# NCTU_Network_Programming
-#Network Programming Course 2020
+# Network Programming Course 2020
 
-## Author
+## DataBases
 
-| 學號 | GitHub 帳號 | 姓名 | Email |
-| --- | ----------- | --- | --- |
-|`0516326`| `Dada870423` | `陳廷達` |daniel211920@gmail.com |
+### USERS
+| Key | Property |
+| --- | ----------- | 
+|UID| INTEGER PRIMARY KEY AUTOINCREMENT | 
+|Username| TEXT NOT NULL UNIQUE | 
+|Email| TEXT NOT NULL | 
+|Password| TEXT NOT NULL | 
 
-## Happy Coding ~
+### BOARDS
+| Key | Property |
+| --- | ----------- | 
+|BID| INTEGER PRIMARY KEY AUTOINCREMENT | 
+|BName| TEXT NOT NULL UNIQUE | 
+|UID| INTEGER | 
 
+### POSTS
+| Key | Property |
+| --- | ----------- | 
+|PID| INTEGER PRIMARY KEY AUTOINCREMENT | 
+|TITLE| TEXT NOT NULL | 
+|BName| TEXT | 
+|UID| INTEGER | 
+|DT| TEXT | 
 
-## SQLite3 tips
-The output format could be adjust by `.width 20, 20, 30, 20`
+~~HappyCoding~~ ~
