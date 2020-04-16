@@ -297,34 +297,35 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
                 # continue
-            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
-            # cursor = cursor.fetchone()
-            elif cursor == None:
-                print(cursor, "Post is not exist.")
-                msg_err = "Post is not exist.\r\n"
-                # ClientSocket.send(msg_err.encode('utf-8'))
-                # continue
             else:
-                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
+                cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 # cursor = cursor.fetchone()
-                print(cursor[0], cursor[1], cursor[2])
-                msg_output = "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
-                ClientSocket.send(msg_output.encode('utf-8'))
-                PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
-                Rcontent = PostPtr.readlines()
-                for i in range(len(Rcontent)):
-                    msg_output = Rcontent[i] + "\r"
+                if cursor == None:
+                    print(cursor, "Post is not exist.")
+                    msg_err = "Post is not exist.\r\n"
+                    # ClientSocket.send(msg_err.encode('utf-8'))
+                    # continue
+                else:
+                    cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
+                    # cursor = cursor.fetchone()
+                    print(cursor[0], cursor[1], cursor[2])
+                    msg_output = "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
                     ClientSocket.send(msg_output.encode('utf-8'))
-                msg_output = "--"
-                ClientSocket.send(msg_output.encode('utf-8'))
-                CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
-                Rcomment = CommentPtr.readlines()
-                for i in range(len(Rcomment)):
-                    msg_output = Rcomment[i] + "\r"
+                    PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
+                    Rcontent = PostPtr.readlines()
+                    for i in range(len(Rcontent)):
+                        msg_output = Rcontent[i] + "\r"
+                        ClientSocket.send(msg_output.encode('utf-8'))
+                    msg_output = "--"
                     ClientSocket.send(msg_output.encode('utf-8'))
-                msg_output = "\r\n"
-                ClientSocket.send(msg_output.encode('utf-8'))
-                continue
+                    CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
+                    Rcomment = CommentPtr.readlines()
+                    for i in range(len(Rcomment)):
+                        msg_output = Rcomment[i] + "\r"
+                        ClientSocket.send(msg_output.encode('utf-8'))
+                    msg_output = "\r\n"
+                    ClientSocket.send(msg_output.encode('utf-8'))
+                    continue
 
 ## delete the post
         if len(msg_split) == 2 and msg_split[0] == "delete-post":
@@ -332,23 +333,24 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
                 # continue
-            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
-            # cursor = cursor.fetchone()
-            elif cursor == None:
-                print(cursor, "Post is not exist.")
-                msg_err = "Post is not exist.\r\n"
-                # ClientSocket.send(msg_err.encode('utf-8'))
-            elif cursor[3] != login:
-                print("Owner is:",  cursor[3])
-                msg_err = "Not the post owner.\r\n"
-                # ClientSocket.send(msg_err.encode('utf-8'))
             else:
-                cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
-                conn.commit()
-                print("POST delete is success")
-                msg_suc = "Delete successfully.\r\n"
-                # ClientSocket.send(msg_suc.encode('utf-8'))
-            # continue
+                cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
+                # cursor = cursor.fetchone()
+                if cursor == None:
+                    print(cursor, "Post is not exist.")
+                    msg_err = "Post is not exist.\r\n"
+                    # ClientSocket.send(msg_err.encode('utf-8'))
+                elif cursor[3] != login:
+                    print("Owner is:",  cursor[3])
+                    msg_err = "Not the post owner.\r\n"
+                    # ClientSocket.send(msg_err.encode('utf-8'))
+                else:
+                    cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
+                    conn.commit()
+                    print("POST delete is success")
+                    msg_suc = "Delete successfully.\r\n"
+                    # ClientSocket.send(msg_suc.encode('utf-8'))
+                # continue
 
 ## update the post
         if msg_input.startswith("update-post ") and len(msg_split) > 2:
