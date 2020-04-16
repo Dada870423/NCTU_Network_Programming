@@ -141,9 +141,9 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
             elif msg_input == "list-board": ## without keyword
-                # cursor = c.execute("SELECT * FROM BOARDS")
+                cursor = c.execute("SELECT * FROM BOARDS").fetchone()
                 # cursor = cursor.fetchone()
-                if (c.execute("SELECT * FROM BOARDS").fetchone()) == None:
+                if cursor == None:
                     print(cursor)
                     msg_err = "There is not any board yet.\r\n"
                     # ClientSocket.send(msg_err.encode('utf-8'))
@@ -243,9 +243,9 @@ def Client_Work(ClientSocket, addr):
                     BName = BNameKey[0]
                     keyword = "%" + BNameKey[1] + "%"
                     print("Bname is :", BName, "keyword is :", keyword)
-                    # cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,))
+                    cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                     # cursor = cursor.fetchone()
-                    if (c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()) == None:                        ## Board is not exist
+                    if cursor == None:                        ## Board is not exist
                         print("Board is not exist")
                         msg_err = "Board is not exist.\r\n"
                         # ClientSocket.send(msg_err.encode('utf-8'))
@@ -267,9 +267,9 @@ def Client_Work(ClientSocket, addr):
                             continue
             else:                      ## without keyword
                 print("Want to search in ", BName, " Board")
-                # cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
+                cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                 # cursor = cursor.fetchone()
-                if (c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()) == None:                        ## Board is not exist
+                if cursor == None:                        ## Board is not exist
                     print("Board is not exist")
                     msg_err = "Board is not exist.\r\n"
                     # ClientSocket.send(msg_err.encode('utf-8'))
@@ -297,9 +297,9 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
                 # continue
-            # cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
             # cursor = cursor.fetchone()
-            elif (c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()) == None:
+            elif cursor == None:
                 print(cursor, "Post is not exist.")
                 msg_err = "Post is not exist.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
@@ -332,9 +332,9 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
                 # continue
-            #cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
-            #cursor = cursor.fetchone()
-            elif (c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()) == None:
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
+            # cursor = cursor.fetchone()
+            elif cursor == None:
                 print(cursor, "Post is not exist.")
                 msg_err = "Post is not exist.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
@@ -356,9 +356,9 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
                 # continue
-            # cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
             # cursor = cursor.fetchone()
-            elif (c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()) == None:
+            elif cursor == None:
                 print(cursor, "Post is not exist.")
                 msg_err = "Post is not exist.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
@@ -396,9 +396,9 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
                 # continue
-            # cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],))
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
             # cursor = cursor.fetchone()
-            elif (c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()) == None:
+            elif cursor == None:
                 print(cursor, "Post is not exist.")
                 msg_err = "Post is not exist.\r\n"
                 # ClientSocket.send(msg_err.encode('utf-8'))
@@ -473,7 +473,7 @@ def Client_Work(ClientSocket, addr):
 
 
 bind_ip = "0.0.0.0"
-bind_port = 3110
+bind_port = 1031
 
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
