@@ -30,6 +30,7 @@ def Client_Work(ClientSocket, addr):
     login = -1 ## check login or not and whoami
     msg_suc = ""
     msg_err = ""
+    msg_Usage = ""
     msg_output = ""
     hashtag = "##"
     TITLE = " --title "
@@ -416,39 +417,39 @@ def Client_Work(ClientSocket, addr):
 
 ## Command not found
         if msg_input.startswith("register"):
-            msg_err = "Usage: register <username> <email> <password>\r\n"
+            msg_Usage = "Usage: register <username> <email> <password>\r\n"
         elif msg_input.startswith("login"):
-            msg_err = "Usage: login <username> <password>\r\n"
+            msg_Usage = "Usage: login <username> <password>\r\n"
         elif msg_input.startswith("whoami"):
-            msg_err = "Usage: whoami\r\n"
+            msg_Usage = "Usage: whoami\r\n"
         elif msg_input.startswith("logout"):
-            msg_err = "Usage: logout\r\n"
+            msg_Usage = "Usage: logout\r\n"
         elif msg_input.startswith("exit"):
-            msg_err = "Usage: exit\r\n"
+            msg_Usage = "Usage: exit\r\n"
         elif msg_input.startswith("create-board"):
-            msg_err = "Usage: create-board <Board Name>\r\n"
+            msg_Usage = "Usage: create-board <Board Name>\r\n"
         elif msg_input.startswith("list-board"):
             if hashtag in msg_input:
-                msg_err = "Usage: list-board ##<keyword>\r\n"
+                msg_Usage = "Usage: list-board ##<keyword>\r\n"
             else:
-                msg_err = "Usage: list-board\r\n"
+                msg_Usage = "Usage: list-board\r\n"
         elif msg_input.startswith("create-post"):
-            msg_err = "Usage: create-post <Board Name> --title <title> --content <content>\r\n"
+            msg_Usage = "Usage: create-post <Board Name> --title <title> --content <content>\r\n"
         elif msg_input.startswith("list-post"):
             if hashtag in msg_input:
-                msg_err = "Usage: list-post <Board Name> ##<keyword>\r\n"
+                msg_Usage = "Usage: list-post <Board Name> ##<keyword>\r\n"
             else:
-                msg_err = "Usage: list-post <Board Name>\r\n"
+                msg_Usage = "Usage: list-post <Board Name>\r\n"
         elif msg_input.startswith("read"):
-            msg_err = "Usage: read <Post ID>\r\n"
+            msg_Usage = "Usage: read <Post ID>\r\n"
         elif msg_input.startswith("delete-post"):
-            msg_err = "Usage: delete-post <Post ID>\r\n"
+            msg_Usage = "Usage: delete-post <Post ID>\r\n"
         elif msg_input.startswith("update-post"):
-            msg_err = "Usage: update-post <Post ID> --title/--content <NEW>\r\n"        
+            msg_Usage = "Usage: update-post <Post ID> --title/--content <NEW>\r\n"        
         elif msg_input.startswith("comment"):
-            msg_err = "Usage: comment <Post ID> <Comment>\r\n" 
+            msg_Usage = "Usage: comment <Post ID> <Comment>\r\n" 
         elif msg_input != "":
-            msg_err = "Command not found\r\n"
+            msg_Usage = "Command not found\r\n"
 
         # if msg_input != "":
         #     ClientSocket.send(msg_err.encode('utf-8'))
@@ -460,6 +461,10 @@ def Client_Work(ClientSocket, addr):
         elif msg_err != "":
             ClientSocket.send(msg_err.encode('utf-8'))
             msg_err = ""
+        else:
+            ClientSocket.send(msg_Usage.encode('utf-8'))
+            msg_Usage = ""
+
 
 
 
