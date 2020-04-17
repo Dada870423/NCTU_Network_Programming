@@ -34,14 +34,13 @@ def Client_Work(ClientSocket, addr):
     print("opened databases successfully")
     c = conn.cursor()
     while True:
-        
         msg = "% "
         ClientSocket.send(msg.encode('utf-8'))
         msg_input = ClientSocket.recv(1024).decode('utf-8')
         msg_input = msg_input.replace('\n', '').replace('\r', '')
         msg_split = msg_input.split()
-
         print("msg : ", msg_input, "  len: ", len(msg_split))
+        
         ## register
         if msg_input.startswith("register "):
             if len(msg_split) == 4:
@@ -136,7 +135,6 @@ def Client_Work(ClientSocket, addr):
                         msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))
                     continue
-
         ## create the post & file of comment
         if msg_input.startswith("create-post"):                             
             if login == -1:
@@ -227,8 +225,6 @@ def Client_Work(ClientSocket, addr):
                             msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
                             ClientSocket.send(msg_output.encode('utf-8'))
                         continue
-
-
         ## read post and read comment
         if len(msg_split) == 2 and msg_split[0] == "read":
             if login == -1:
