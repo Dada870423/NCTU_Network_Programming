@@ -136,7 +136,7 @@ def Client_Work(ClientSocket, addr):
                         ClientSocket.send(msg_output.encode('utf-8'))
                     continue
         ## create the post & file of comment
-        if msg_input.startswith("create-post"):                             
+        if msg_input.startswith("create-post "):                             
             if login == -1:
                 msg_err = "Please login first.\r\n"
             elif len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
