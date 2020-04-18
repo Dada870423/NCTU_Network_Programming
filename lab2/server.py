@@ -98,7 +98,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
                     conn.commit()
                     print("Board insertion is success")
-                    msg_suc = "Create board srccessfully.\r\n"
+                    msg_suc = "Create board successfully.\r\n"
                 except Error:
                     print("Board is already exist")
                     msg_err = "Board is already exist\r\n"
@@ -143,10 +143,10 @@ def Client_Work(ClientSocket, addr):
                 no_create = msg_input.replace("create-post ", "", 1)           ## Bname = BoardTitle[0]
                 if msg_split[1] == "--title":                                  ## Title = TitleContent[0]
                     print("He did not choose the board")                       ## Content = TitleContent[1]
-                    msg_err = "Please choose a board.\r\n"
+                    # msg_err = "Please choose a board.\r\n"
                 elif msg_split[3] == "--content":
                     print("He did not name the title")
-                    msg_err = "Please name the title.\r\n"
+                    # msg_err = "Please name the title.\r\n"
                 else:
                     BoardTitle = no_create.split(" --title ")                   
                     TitleContent = BoardTitle[1].split(" --content ")           
@@ -161,8 +161,8 @@ def Client_Work(ClientSocket, addr):
                         cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
                         conn.commit()
                         print(NowTime, type(NowTime), "POST insertion is success")
-                        msg_output = "CREATE POST successfully.\r\n"
-                        ClientSocket.send(msg_output.encode('utf-8'))
+                        msg_suc = "Create post successfully.\r\n"
+                        # ClientSocket.send(msg_output.encode('utf-8'))
                         DIR = 'data/post'
                         P_num = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) 
                         cnt = TitleContent[1].split("<br>")
@@ -170,7 +170,7 @@ def Client_Work(ClientSocket, addr):
                         for iter_cnt in cnt:
                             print(iter_cnt)
                             os.system("echo {} >> data/post/{}".format(iter_cnt, P_num+1))
-                        continue
+                        # continue
         ## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "", 1)
@@ -180,7 +180,7 @@ def Client_Work(ClientSocket, addr):
             elif hashtag in BName: 
                 if msg_split[1].startswith("##"):
                     print("He did not choose the board")
-                    msg_err = "Please choose a board.\r\n"
+                    # msg_err = "Please choose a board.\r\n"
                 else:
                     BNameKey = BName.split(" ##")
                     BName = BNameKey[0]
@@ -328,27 +328,27 @@ def Client_Work(ClientSocket, addr):
         elif msg_input.startswith("exit"):
             msg_Usage = "Usage: exit\r\n"
         elif msg_input.startswith("create-board"):
-            msg_Usage = "Usage: create-board <Board Name>\r\n"
+            msg_Usage = "Usage: create-board <borad-name>\r\n"
         elif msg_input.startswith("list-board"):
             if hashtag in msg_input:
-                msg_Usage = "Usage: list-board ##<keyword>\r\n"
+                msg_Usage = "Usage: list-board ##<key>\r\n"
             else:
                 msg_Usage = "Usage: list-board\r\n"
         elif msg_input.startswith("create-post"):
-            msg_Usage = "Usage: create-post <Board Name> --title <title> --content <content>\r\n"
+            msg_Usage = "Usage: create-post <board-name> --title <title> --content <content>\r\n"
         elif msg_input.startswith("list-post"):
             if hashtag in msg_input:
-                msg_Usage = "Usage: list-post <Board Name> ##<keyword>\r\n"
+                msg_Usage = "Usage: list-post <board-name> ##<key>\r\n"
             else:
-                msg_Usage = "Usage: list-post <Board Name>\r\n"
+                msg_Usage = "Usage: list-post <board-name>\r\n"
         elif msg_input.startswith("read"):
-            msg_Usage = "Usage: read <Post ID>\r\n"
+            msg_Usage = "Usage: read <post-id>\r\n"
         elif msg_input.startswith("delete-post"):
-            msg_Usage = "Usage: delete-post <Post ID>\r\n"
+            msg_Usage = "Usage: delete-post <post-id>\r\n"
         elif msg_input.startswith("update-post"):
-            msg_Usage = "Usage: update-post <Post ID> --title/--content <NEW>\r\n"        
+            msg_Usage = "Usage: update-post <post-id> --title/content <new>\r\n"        
         elif msg_input.startswith("comment"):
-            msg_Usage = "Usage: comment <Post ID> <Comment>\r\n" 
+            msg_Usage = "Usage: comment <post-id> <comment>\r\n" 
         elif msg_input != "":
             msg_Usage = "Command not found\r\n"
         ## output to client
