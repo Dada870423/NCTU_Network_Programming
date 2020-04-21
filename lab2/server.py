@@ -19,7 +19,6 @@ def Client_Work(ClientSocket, addr):
     ClientSocket.send(msg.encode('utf-8'))
 
     # ClientSocket.recv(1024) # there is no trash in cmd 
-    # msg_input = ""  # get out the trash # there is no trash in cmd
     
     # Initialize
     login = -1 ## check login or not and whoami
@@ -109,32 +108,32 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
             elif msg_input == "list-board": ## without keyword
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
+                msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+                ClientSocket.send(msg_output.encode('utf-8'))
                 if cursor == None:
                     print(cursor)
-                    msg_err = "There is not any board yet.\r\n"
+                    # msg_err = "There is not any board yet.\r\n"
                 else:
-                    msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-                    ClientSocket.send(msg_output.encode('utf-8'))
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))   
-                    continue
+                continue
             elif hashtag in HBName: ## with keyword
                 BName = HBName.replace(" ##", "", 1)
                 BName = "%" + BName + "%"
                 cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )).fetchone()
+                msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+                ClientSocket.send(msg_output.encode('utf-8'))
                 if cursor == None:
                     print(cursor)	
-                    msg_err = "No keyword board yet.\r\n"
+                    # msg_err = "No keyword board yet.\r\n"
                 else:
-                    msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-                    ClientSocket.send(msg_output.encode('utf-8'))
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))
-                    continue
+                continue
         ## create the post & file of comment
         if msg_input.startswith("create-post "):                             
             if login == -1:
@@ -143,10 +142,8 @@ def Client_Work(ClientSocket, addr):
                 no_create = msg_input.replace("create-post ", "", 1)           ## Bname = BoardTitle[0]
                 if msg_split[1] == "--title":                                  ## Title = TitleContent[0]
                     print("He did not choose the board")                       ## Content = TitleContent[1]
-                    # msg_err = "Please choose a board.\r\n"
                 elif msg_split[3] == "--content":
                     print("He did not name the title")
-                    # msg_err = "Please name the title.\r\n"
                 else:
                     BoardTitle = no_create.split(" --title ")                   
                     TitleContent = BoardTitle[1].split(" --content ")           
@@ -162,7 +159,6 @@ def Client_Work(ClientSocket, addr):
                         conn.commit()
                         print(NowTime, type(NowTime), "POST insertion is success")
                         msg_suc = "Create post successfully.\r\n"
-                        # ClientSocket.send(msg_output.encode('utf-8'))
                         DIR = 'data/post'
                         P_num = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) 
                         cnt = TitleContent[1].split("<br>")
@@ -170,7 +166,6 @@ def Client_Work(ClientSocket, addr):
                         for iter_cnt in cnt:
                             print(iter_cnt)
                             os.system("echo {} >> data/post/{}".format(iter_cnt, P_num+1))
-                        # continue
         ## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "", 1)
@@ -180,7 +175,6 @@ def Client_Work(ClientSocket, addr):
             elif hashtag in BName: 
                 if msg_split[1].startswith("##"):
                     print("He did not choose the board")
-                    # msg_err = "Please choose a board.\r\n"
                 else:
                     BNameKey = BName.split(" ##")
                     BName = BNameKey[0]
@@ -193,17 +187,17 @@ def Client_Work(ClientSocket, addr):
                     else:
                         print("Board is exist")
                         cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)).fetchone()
+                        msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+                        ClientSocket.send(msg_output.encode('utf-8'))
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
-                            msg_err = "There is not any post in this board yet.\r\n"
+                            # msg_err = "There is not any post in this board yet.\r\n"
                         else:
-                            msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                            ClientSocket.send(msg_output.encode('utf-8'))
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
                                 print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                                 msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
                                 ClientSocket.send(msg_output.encode('utf-8'))
-                            continue
+                        continue
             ## without keyword
             else:  
                 print("Want to search in ", BName, " Board")
@@ -214,17 +208,17 @@ def Client_Work(ClientSocket, addr):
                 else:
                     print("Board is exist")
                     cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )).fetchone()
+                    msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+                    ClientSocket.send(msg_output.encode('utf-8'))
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
-                        msg_err = "There is not any post in this board yet.\r\n"
+                        # msg_err = "There is not any post in this board yet.\r\n"
                     else:
-                        msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                        ClientSocket.send(msg_output.encode('utf-8'))
                         for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
                             print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                             msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
                             ClientSocket.send(msg_output.encode('utf-8'))
-                        continue
+                    continue
         ## read post and read comment
         if len(msg_split) == 2 and msg_split[0] == "read":
             if login == -1:
