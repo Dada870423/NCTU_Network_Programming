@@ -33,8 +33,8 @@ def Client_Work(ClientSocket, addr):
     print("opened databases successfully")
     c = conn.cursor()
     while True:
-        msg = "% "
-        ClientSocket.send(msg.encode('utf-8'))
+        # msg = "% "
+        # ClientSocket.send(msg.encode('utf-8'))
         msg_input = ClientSocket.recv(1024).decode('utf-8')
         msg_input = msg_input.replace('\n', '').replace('\r', '')
         msg_split = msg_input.split()
@@ -85,6 +85,8 @@ def Client_Work(ClientSocket, addr):
         ## exit
         if msg_input == "exit":
             print("the client ", login," want to bye")
+            msg_suc = "EXIT"
+            ClientSocket.send(msg_suc.encode('utf-8'))
             ClientSocket.close()
             break
 # ------------- Lab1 done
@@ -345,17 +347,19 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Usage: comment <post-id> <comment>\r\n" 
         elif msg_input != "":
             msg_Usage = "Command not found\r\n"
+        else:
+            msg_Usage = " \r\n"
         ## output to client
         if msg_suc != "":
-            msg_suc = "SUC " + msg_suc
+            msg_suc = "int80 " + msg_suc
             ClientSocket.send(msg_suc.encode('utf-8'))
             msg_suc = ""
         elif msg_err != "":
-            msg_err = "ERROR " + msg_err
+            msg_err = "int80 " + msg_err
             ClientSocket.send(msg_err.encode('utf-8'))
             msg_err = ""
         else:
-            msg_Usage = "ERROR " + msg_Usage
+            msg_Usage = "int80 " + msg_Usage
             ClientSocket.send(msg_Usage.encode('utf-8'))
             msg_Usage = ""
 

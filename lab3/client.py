@@ -1,24 +1,18 @@
 import socket
 
 
-
-
-
-def Error_handling(Error_msg):
-    Err_msg = Error_msg.replace("ERROR ", "", 1)
-    print (EErr_msg)
+def CmdLine():
     cmd = input("% ")
     s.send(cmd.encode('utf-8'))
-    get = s.recv(1024).decode('utf-8')
-    return get
+    return cmd
 
-def Success_handling(Success_msg):
-    Suc_msg = Success_msg.replace("SUC ", "", 1)
-    print (Suc_msg)
-    cmd = input("% ")
-    s.send(cmd.encode('utf-8'))
-    get = s.recv(1024).decode('utf-8')
-    return get
+
+def INT_handling(int_msg):
+    int_msg = int_msg.replace("int80 ", "", 1)
+    print (Err_msg)
+    
+
+
 
 
 HOST = '34.201.243.85'
@@ -28,21 +22,22 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
 get = s.recv(1024).decode('utf-8')
-cmd = input("% ")
-s.send(cmd.encode('utf-8'))
+print ("server send :  ", get)
+cmd = CmdLine()
 get = s.recv(1024).decode('utf-8')
-while True:
+print ("server send :  ", get)
+for i in range(10):
     print ("server send :  ", get) ## .decode('utf-8'))
-    if get.startswith("ERROR "):
-        cmd = Error_handling(get)
-    elif get.startswith("SUC "):
-    	cmd = Success_handling(get)
+    if get.startswith("int80 "): ## print suc/err msg
+        INT_handling(get)
+
+
     # elif cmd.startswith("register "):
+    cmd = CmdLine()
 
-
-
-
-
+    if cmd.upper() == "EXIT":
+    	break
+    get = s.recv(1024).decode('utf-8')
     get = cmd
 
 
