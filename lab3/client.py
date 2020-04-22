@@ -21,11 +21,13 @@ def Success_handling(Success_msg):
     return get
 
 
-#HOST = '54.198.148.205'
+HOST = '34.201.243.85'
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
+
+get = s.recv(1024).decode('utf-8')
 cmd = input("% ")
 s.send(cmd.encode('utf-8'))
 get = s.recv(1024).decode('utf-8')
@@ -41,6 +43,6 @@ while True:
 
 
 
-    cmd = get
+    get = cmd
 
 
