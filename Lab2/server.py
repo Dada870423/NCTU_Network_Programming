@@ -104,9 +104,7 @@ def Client_Work(ClientSocket, addr):
         ## To list the board
         if msg_input.startswith("list-board"): 
             HBName = msg_input.replace("list-board", "", 1)
-            if login == -1:
-                msg_err = "Please login first.\r\n"
-            elif msg_input == "list-board": ## without keyword
+            if msg_input == "list-board": ## without keyword
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
                 msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
                 ClientSocket.send(msg_output.encode('utf-8'))
@@ -169,10 +167,8 @@ def Client_Work(ClientSocket, addr):
         ## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "", 1)
-            if login == -1:
-                msg_err = "Please login first.\r\n"
             ## with keyword
-            elif hashtag in BName: 
+            if hashtag in BName: 
                 if msg_split[1].startswith("##"):
                     print("He did not choose the board")
                 else:
@@ -221,33 +217,30 @@ def Client_Work(ClientSocket, addr):
                     continue
         ## read post and read comment
         if len(msg_split) == 2 and msg_split[0] == "read":
-            if login == -1:
-                msg_err = "Please login first.\r\n"
+            cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
+            if cursor == None:
+                print(cursor, "Post is not exist.")
+                msg_err = "Post is not exist.\r\n"
             else:
-                cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
-                if cursor == None:
-                    print(cursor, "Post is not exist.")
-                    msg_err = "Post is not exist.\r\n"
-                else:
-                    cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
-                    print(cursor[0], cursor[1], cursor[2])
-                    msg_output = "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
+                print(cursor[0], cursor[1], cursor[2])
+                msg_output = "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                ClientSocket.send(msg_output.encode('utf-8'))
+                PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
+                Rcontent = PostPtr.readlines()
+                for i in range(len(Rcontent)):
+                    msg_output = Rcontent[i] + "\r"
                     ClientSocket.send(msg_output.encode('utf-8'))
-                    PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
-                    Rcontent = PostPtr.readlines()
-                    for i in range(len(Rcontent)):
-                        msg_output = Rcontent[i] + "\r"
-                        ClientSocket.send(msg_output.encode('utf-8'))
-                    msg_output = "--"
+                msg_output = "--"
+                ClientSocket.send(msg_output.encode('utf-8'))
+                CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
+                Rcomment = CommentPtr.readlines()
+                for i in range(len(Rcomment)):
+                    msg_output = Rcomment[i] + "\r"
                     ClientSocket.send(msg_output.encode('utf-8'))
-                    CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
-                    Rcomment = CommentPtr.readlines()
-                    for i in range(len(Rcomment)):
-                        msg_output = Rcomment[i] + "\r"
-                        ClientSocket.send(msg_output.encode('utf-8'))
-                    msg_output = "\r\n"
-                    ClientSocket.send(msg_output.encode('utf-8'))
-                    continue
+                msg_output = "\r\n"
+                ClientSocket.send(msg_output.encode('utf-8'))
+                continue
         ## delete the post
         if len(msg_split) == 2 and msg_split[0] == "delete-post":
             if login == -1:
