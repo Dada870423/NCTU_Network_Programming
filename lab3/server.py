@@ -43,12 +43,13 @@ def Client_Work(ClientSocket, addr):
         ## register
         if msg_input.startswith("register "):
             if len(msg_split) == 4:
-                try:
+                cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
+                if cursor == None:
                     cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
                     conn.commit()
                     print("USER insertion is success")
                     msg_suc = "Register successfully.\r\n"
-                except Error:
+                else:
                     print("Username is already used")
                     msg_err = "Username is already used.\r\n"
         ## login
@@ -93,14 +94,20 @@ def Client_Work(ClientSocket, addr):
                 msg_err = "Please login first.\r\n"
             else:
                 BName = msg_input.replace("create-board ", "", 1)
-                try:
+                cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
+                if cursor == None:
                     cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
                     conn.commit()
                     print("Board insertion is success")
                     msg_suc = "Create board successfully.\r\n"
-                except Error:
+                else:
                     print("Board is already exist")
                     msg_err = "Board is already exist\r\n"
+        
+
+
+
+
         ## To list the board
         if msg_input.startswith("list-board"): 
             HBName = msg_input.replace("list-board", "", 1)
@@ -340,12 +347,15 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Command not found\r\n"
         ## output to client
         if msg_suc != "":
+            msg_suc = "SUC " + msg_suc
             ClientSocket.send(msg_suc.encode('utf-8'))
             msg_suc = ""
         elif msg_err != "":
+            msg_err = "ERROR " + msg_err
             ClientSocket.send(msg_err.encode('utf-8'))
             msg_err = ""
         else:
+            msg_Usage = "ERROR " + msg_Usage
             ClientSocket.send(msg_Usage.encode('utf-8'))
             msg_Usage = ""
 
