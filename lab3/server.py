@@ -29,6 +29,8 @@ def Client_Work(ClientSocket, addr):
     hashtag = "##"
     TITLE = " --title "
     CONTENT = " --content "
+    board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+    post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
     conn = sqlite3.connect('BBS.db')
     print("opened databases successfully")
     c = conn.cursor()
@@ -85,8 +87,6 @@ def Client_Work(ClientSocket, addr):
         ## exit
         if msg_input == "exit":
             print("the client ", login," want to bye")
-            msg_suc = "EXIT"
-            ClientSocket.send(msg_suc.encode('utf-8'))
             ClientSocket.close()
             break
 # ------------- Lab1 done
@@ -115,12 +115,11 @@ def Client_Work(ClientSocket, addr):
             HBName = msg_input.replace("list-board", "", 1)
             if msg_input == "list-board": ## without keyword
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
-                msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-                ClientSocket.send(msg_output.encode('utf-8'))
                 if cursor == None:
                     print(cursor)
-                    # msg_err = "There is not any board yet.\r\n"
+                    msg_suc = board_Col_name
                 else:
+                    ClientSocket.send(board_Col_name.encode('utf-8'))
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
@@ -130,12 +129,11 @@ def Client_Work(ClientSocket, addr):
                 BName = HBName.replace(" ##", "", 1)
                 BName = "%" + BName + "%"
                 cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )).fetchone()
-                msg_output = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-                ClientSocket.send(msg_output.encode('utf-8'))
                 if cursor == None:
                     print(cursor)	
-                    # msg_err = "No keyword board yet.\r\n"
+                    msg_suc = board_Col_name
                 else:
+                    ClientSocket.send(board_Col_name.encode('utf-8'))
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
@@ -192,12 +190,13 @@ def Client_Work(ClientSocket, addr):
                     else:
                         print("Board is exist")
                         cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)).fetchone()
-                        msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                        ClientSocket.send(msg_output.encode('utf-8'))
+                        # msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+                        # ClientSocket.send(msg_output.encode('utf-8'))
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
-                            # msg_err = "There is not any post in this board yet.\r\n"
+                            msg_suc = post_Col_name ## "int80" + colname
                         else:
+                            ClientSocket.send(post_Col_name.encode('utf-8'))
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
                                 print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                                 msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
@@ -213,12 +212,14 @@ def Client_Work(ClientSocket, addr):
                 else:
                     print("Board is exist")
                     cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )).fetchone()
-                    msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                    ClientSocket.send(msg_output.encode('utf-8'))
+                    # msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+                    # ClientSocket.send(msg_output.encode('utf-8'))
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
-                        # msg_err = "There is not any post in this board yet.\r\n"
+                        msg_output = "int80 " + post_Col_name
+                        ClientSocket.send(msg_output.encode('utf-8'))
                     else:
+                        ClientSocket.send(post_Col_name.encode('utf-8'))
                         for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
                             print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                             msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
@@ -345,10 +346,9 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Usage: update-post <post-id> --title/content <new>\r\n"        
         elif msg_input.startswith("comment"):
             msg_Usage = "Usage: comment <post-id> <comment>\r\n" 
-        elif msg_input != "":
-            msg_Usage = "Command not found\r\n"
         else:
-            msg_Usage = " \r\n"
+            msg_Usage = "Command not found\r\n"
+
         ## output to client
         if msg_suc != "":
             msg_suc = "int80 " + msg_suc
