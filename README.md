@@ -9,6 +9,7 @@
 |Username| TEXT NOT NULL UNIQUE | 
 |Email| TEXT NOT NULL | 
 |Password| TEXT NOT NULL | 
+|BucketId| TEXT NOT NULL | 
 
 ### BOARDS
 | Key | Property |
