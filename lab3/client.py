@@ -1,8 +1,31 @@
 import socket
+import os
+
 
 
 POS = "POS"
 NEG = "NEG"
+board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
+post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+
+
+
+def MKDIR():
+    Fdata = "./.data"
+    Fpost = "./.data/post"
+    Cpost = "./.data/comment"
+
+    try:
+      os.makedirs(Fdata)
+      os.makedirs(Fpost)
+      os.makedirs(Cpost)
+    except FileExistsError:
+      return
+
+
+
+
+
 
 
 def INT_handling(int_msg):
@@ -10,19 +33,20 @@ def INT_handling(int_msg):
     if int_msg.startswith("SUC"):
     	int_msg = int_msg.replace("SUC ", "", 1)
     	response = 0
-    	print(int_msg)
     elif int_msg.startswith("ERR"):
     	int_msg = int_msg.replace("ERR ", "", 1)
     	response = 1
-    	print(int_msg)
     elif int_msg.startswith("USAGE"):
     	int_msg = int_msg.replace("USAGE ", "", 1)
     	response = 2
-    	print(int_msg)
     elif int_msg.startswith("POS"):
-    	response = 3
+    	return 3
     elif int_msg.startswith("NEG"):
-    	response = 4
+    	return 4
+    elif int_msg.startswith("DATA"):
+        int_msg = int_msg.replace("DATA ", "", 1)
+        response  = 5
+    print(int_msg)
     return response
 
     
@@ -81,10 +105,19 @@ def CBOARD(CMD):
 
 
         ## S3 done
-        ### if s3 success then
-    	###    s.send(POS.encode('utf-8'))
+        if True:
+    	    s.send(POS.encode('utf-8'))
+        get1 = s.recv(1024).decode('utf-8')
+        response1 = INT_handling(int_msg = get1)
+
+
+
+def LBOARD(CMD):
+    print(board_Col_name)
+    FLAG = 0
+    while FLAG != 4:
         get = s.recv(1024).decode('utf-8')
-        response1 = INT_handling(int_msg = get)
+        FLAG = INT_handling(int_msg = get)
 
 
 
@@ -96,12 +129,13 @@ PORT = 1031
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 
+MKDIR()
+
+
 welcome = s.recv(1024).decode('utf-8')
 print (welcome)
 
 
-
-Get_Input = 1
 
 get = "" ## get is return msg from server
 while True:
@@ -120,8 +154,33 @@ while True:
         LOGOUT(CMD = cmd)
     elif cmd.startswith("create-board"):
         CBOARD(CMD = cmd)
+    elif cmd.startswith("list-board"):
+        CBOARD(CMD = cmd)    
     else:
         get = s.recv(1024).decode('utf-8')
         INT_handling(int_msg = get)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

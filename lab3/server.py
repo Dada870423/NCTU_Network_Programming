@@ -126,29 +126,24 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
                 if cursor == None:
                     print(cursor)
-                    msg_suc = board_Col_name
                 else:
-                    ClientSocket.send(board_Col_name.encode('utf-8'))
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))   
-                    continue
+                ClientSocket.send(NEG.encode('utf-8'))
             elif hashtag in HBName: ## with keyword
                 BName = HBName.replace(" ##", "", 1)
                 BName = "%" + BName + "%"
                 cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )).fetchone()
                 if cursor == None:
-                    print(cursor)	
-                    msg_suc = board_Col_name
+                    print(cursor)
                 else:
-                    ClientSocket.send(board_Col_name.encode('utf-8'))
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))
-                continue
-        
+                ClientSocket.send(NEG.encode('utf-8'))
 # -------------~ client done
         ## create the post & file of comment
         if msg_input.startswith("create-post "):                             
