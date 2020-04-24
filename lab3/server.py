@@ -25,7 +25,7 @@ def Client_Work(ClientSocket, addr):
 
 
 
-    ClientSocket.setblocking(0)
+    
 
 
     ## print welcome msg
@@ -165,7 +165,6 @@ def Client_Work(ClientSocket, addr):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                         SEND(CMD = msg_output)
-                        msg_output = ""
                 SEND(CMD = NEG)
 # -------------~ client done
         ## create the post & file of comment
@@ -401,7 +400,7 @@ bind_port = 1031
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 server.bind((bind_ip,bind_port))
-
+server.setblocking(0)
 server.listen(17)
 print ("[*] Listening on  ", bind_ip,  bind_port)
 
