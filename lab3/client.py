@@ -132,6 +132,7 @@ def LBOARD(CMD):
     while FLAG == 5:
         get = RECEIVE()
         FLAG = INT_handling(int_msg = get)
+        print("FLag - ", FLAG)
 
 
 
