@@ -97,18 +97,18 @@ def Client_Work(ClientSocket, addr):
         ## create-board
         if msg_input.startswith("create-board "):
             if login == -1:
-                msg_err = "Please login first.\r\n"
-            else:
+                msg_output = "ERR " + "Please login first.\r\n"
+            elif len(msg_split) > 1:
                 BName = msg_input.replace("create-board ", "", 1)
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                 if cursor == None:
                     cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
                     conn.commit()
                     print("Board insertion is success")
-                    msg_suc = "Create board successfully.\r\n"
+                    msg_output = "SUC " + "Create board successfully.\r\n"
                 else:
                     print("Board is already exist")
-                    msg_err = "Board is already exist\r\n"
+                    msg_output = "ERR " + "Board is already exist\r\n"
         
 
 
@@ -367,7 +367,7 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "USAGE " + msg_Usage
             ClientSocket.send(msg_Usage.encode('utf-8'))
             msg_Usage = ""
-            msg_output = ""
+        msg_output = ""
 
 
 bind_ip = "0.0.0.0"
