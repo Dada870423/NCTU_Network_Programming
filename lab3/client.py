@@ -22,9 +22,21 @@ def MKDIR():
     except FileExistsError:
       return
 
+def RECEIVE():
+    while True:
+        try:
+            msg_in = s.recv(1024).decode('utf-8')
+            return msg_in
+        except:
+            pass    
 
-
-
+def SEND(CMD):
+    while True:
+        try:
+            s.send(CMD.encode('utf-8'))
+            break
+        except:
+            pass
 
 
 
@@ -58,12 +70,12 @@ def CmdLine():
     while test == "":
         cmd = input("% ")
         test = cmd.replace(' ', '')
-    s.send(cmd.encode('utf-8'))
+    SEND(CMD = cmd)
     return cmd
 
 
 def REG(CMD):
-    get = s.recv(1024).decode('utf-8')
+    get = RECEIVE()
     response = INT_handling(int_msg = get)
     if response == 1:
     	gogo_S3 = 1
@@ -77,7 +89,7 @@ def REG(CMD):
 
 
 def LOGIN(CMD):
-    get = s.recv(1024).decode('utf-8')	
+    get = RECEIVE()	
     response = INT_handling(int_msg = get)
     if response == 1:
     	gogo_S3 = 1
@@ -90,16 +102,16 @@ def LOGIN(CMD):
 
 
 def WHOAMI(CMD):
-    get = s.recv(1024).decode('utf-8')
+    get = RECEIVE()
     response = INT_handling(int_msg = get)
 
 
 def LOGOUT(CMD):
-    get = s.recv(1024).decode('utf-8')
+    get = RECEIVE()
     response = INT_handling(int_msg = get)
 
 def CBOARD(CMD):
-    get = s.recv(1024).decode('utf-8')
+    get = RECEIVE()
     response = INT_handling(int_msg = get)
     if response == 3:
         gogo_S3 = 1
@@ -108,8 +120,8 @@ def CBOARD(CMD):
 
         ## S3 done
         if True:
-    	    s.send(POS.encode('utf-8'))
-        get1 = s.recv(1024).decode('utf-8')
+    	    SEND(CMD = POS)
+        get1 = RECEIVE()
         response1 = INT_handling(int_msg = get1)
 
 
@@ -118,7 +130,7 @@ def LBOARD(CMD):
     print(board_Col_name)
     FLAG = 5
     while FLAG == 5:
-        get = s.recv(1024).decode('utf-8')
+        get = RECEIVE()
         FLAG = INT_handling(int_msg = get)
 
 
@@ -130,11 +142,11 @@ PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
-
+s.setblocking(0)
 MKDIR()
 
 
-welcome = s.recv(1024).decode('utf-8')
+welcome = RECEIVE()
 print (welcome)
 
 
@@ -159,7 +171,7 @@ while True:
     elif cmd.startswith("list-board"):
         LBOARD(CMD = cmd)    
     else:
-        get = s.recv(1024).decode('utf-8')
+        get = RECEIVE()
         INT_handling(int_msg = get)
 
 

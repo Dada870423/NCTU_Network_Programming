@@ -7,6 +7,27 @@ import os
 from sqlite3 import Error
 
 def Client_Work(ClientSocket, addr):
+    def RECEIVE():
+    while True:
+        try:
+            msg_in = s.recv(1024).decode('utf-8')
+            return msg_in
+        except:
+            pass    
+
+def SEND(CMD):
+    while True:
+        try:
+            s.send(CMD.encode('utf-8'))
+            break
+        except:
+            pass
+
+
+
+
+
+
     ## print welcome msg
     msg = ""
     msg =  "*************************************************************************************************************************************\r\n" + \
