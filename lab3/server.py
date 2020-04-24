@@ -50,40 +50,44 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
                     conn.commit()
                     print("USER insertion is success")
-                    msg_suc = "Register successfully.\r\n"
+                    msg_output = "SUC " + "Register successfully.\r\n"
                 else:
                     print("Username is already used")
-                    msg_err = "Username is already used.\r\n"
+                    msg_output = "ERR " + "Username is already used.\r\n"
+                ClientSocket.send(msg_output.encode('utf-8'))
         ## login
         if msg_input.startswith("login "):
-            if login > -1:
-                    msg_err = "Please logout first.\r\n"
-            elif len(msg_split) == 3:
+            if len(msg_split) == 3:
                 cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
-                if cursor != None and cursor[3] == msg_split[2]: #person is exist
+                if login > -1:
+                    msg_output = "ERR " + "Please logout first.\r\n"
+                elif cursor != None and cursor[3] == msg_split[2]: #person is exist
                     print("She is ", cursor[0], cursor[1])
                     login = cursor[0]
-                    msg_suc = "Welcome, " + cursor[1] + "\r\n"
+                    msg_output = "SUC " + "Welcome, " + cursor[1] + "\r\n"
                 else:   # no such person or password is incorrect
-                    msg_err = "Login failed." + "\r\n"
+                    msg_output = "ERR " + "Login failed." + "\r\n"
+                ClientSocket.send(msg_output.encode('utf-8'))
         ## whoami
         if msg_input == "whoami":
             if login > -1:
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
                 print("I am ", cursor[0])
-                msg_suc = cursor[1] + "\r\n"
+                msg_output = "SUC " + cursor[1] + "\r\n"
             else:
-                msg_err = "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first.\r\n"
                 print("He didn't login")
+            ClientSocket.send(msg_output.encode('utf-8'))
         ## logout
         if msg_input == "logout":
             if login > -1:
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
                 login = -1
                 print("Bye from ", cursor[0], "\r\n")
-                msg_suc = "Bye, " + cursor[1] + "\r\n"
+                msg_output = "SUC " + "Bye, " + cursor[1] + "\r\n"
             else:
-                msg_err = "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first.\r\n"
+            ClientSocket.send(msg_output.encode('utf-8'))
         ## exit
         if msg_input == "exit":
             print("the client ", login," want to bye")
@@ -350,18 +354,18 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Command not found\r\n"
 
         ## output to client
-        if msg_suc != "":
-            msg_suc = "int80 " + msg_suc
-            ClientSocket.send(msg_suc.encode('utf-8'))
-            msg_suc = ""
-        elif msg_err != "":
-            msg_err = "int80 " + msg_err
-            ClientSocket.send(msg_err.encode('utf-8'))
-            msg_err = ""
-        else:
-            msg_Usage = "int80 " + msg_Usage
-            ClientSocket.send(msg_Usage.encode('utf-8'))
-            msg_Usage = ""
+#        if msg_suc != "":
+#            msg_suc = "SUC " + msg_suc
+#            ClientSocket.send(msg_suc.encode('utf-8'))
+#            msg_suc = ""
+#        elif msg_err != "":
+#            msg_err = "ERR " + msg_err
+#            ClientSocket.send(msg_err.encode('utf-8'))
+#            msg_err = ""
+#        else:
+        msg_Usage = "USAGE " + msg_Usage
+        ClientSocket.send(msg_Usage.encode('utf-8'))
+        msg_Usage = ""
 
 
 bind_ip = "0.0.0.0"
