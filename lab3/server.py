@@ -10,7 +10,7 @@ def Client_Work(ClientSocket, addr):
     def RECEIVE():
         while True:
             try:
-                msg_in = s.recv(1024).decode('utf-8')
+                msg_in = ClientSocket.recv(1024).decode('utf-8')
                 return msg_in
             except:
                 pass    
@@ -18,14 +18,14 @@ def Client_Work(ClientSocket, addr):
     def SEND(CMD):
         while True:
             try:
-                s.send(CMD.encode('utf-8'))
+                ClientSocket.send(CMD.encode('utf-8'))
                 break
             except:
                 pass
 
 
 
-
+    ClientSocket.setblocking(0)
 
 
     ## print welcome msg
@@ -399,7 +399,7 @@ bind_port = 1031
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 server.bind((bind_ip,bind_port))
-server.setblocking(0)
+
 server.listen(17)
 print ("[*] Listening on  ", bind_ip,  bind_port)
 
