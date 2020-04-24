@@ -37,7 +37,7 @@ def Client_Work(ClientSocket, addr):
            "  \ V  V /  __/ | (_| (_) | | | | | |  __/ | || (_) | | |_| | | |  __/  | |_) | |_) |__) |  \__ \  __/ |   \ V /  __/ |              \r\n" + \
            "   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/   \__|_| |_|\___|  |____/|____/____/   |___/\___|_|    \_/ \___|_|          \r\n\r\n" + \
            "*************************************************************************************************************************************\r\n"
-    ClientSocket.send(msg.encode('utf-8'))
+    SEND(CMD = msg)
 
     # ClientSocket.recv(1024) # there is no trash in cmd 
     
@@ -60,7 +60,7 @@ def Client_Work(ClientSocket, addr):
     while True:
         # msg = "% "
         # ClientSocket.send(msg.encode('utf-8'))
-        msg_input = ClientSocket.recv(1024).decode('utf-8')
+        msg_input = RECEIVE()
         msg_input = msg_input.replace('\n', '').replace('\r', '')
         msg_split = msg_input.split()
         print("msg : ", msg_input, "  len: ", len(msg_split))
@@ -100,7 +100,7 @@ def Client_Work(ClientSocket, addr):
             else:
                 msg_output = "ERR " + "Please login first."
                 print("He didn't login")
-            ClientSocket.send(msg_output.encode('utf-8'))
+            SEND(CMD = msg_output)
         ## logout
         if msg_input == "logout":
             if login > -1:
@@ -399,7 +399,7 @@ bind_port = 1031
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 server.bind((bind_ip,bind_port))
-
+server.setblocking(0)
 server.listen(17)
 print ("[*] Listening on  ", bind_ip,  bind_port)
 
