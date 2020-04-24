@@ -152,6 +152,7 @@ def Client_Work(ClientSocket, addr):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                         SEND(CMD = msg_output)
+                        msg_output = ""
                 SEND(CMD = NEG)
             elif hashtag in HBName: ## with keyword
                 BName = HBName.replace(" ##", "", 1)
@@ -164,10 +165,11 @@ def Client_Work(ClientSocket, addr):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                         SEND(CMD = msg_output)
+                        msg_output = ""
                 SEND(CMD = NEG)
 # -------------~ client done
         ## create the post & file of comment
-        if msg_input.startswith("create-post "):                             
+        if msg_input.startswith("create-post "):         
             if len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
                 no_create = msg_input.replace("create-post ", "", 1)           ## Bname = BoardTitle[0]
                 if login == -1:
