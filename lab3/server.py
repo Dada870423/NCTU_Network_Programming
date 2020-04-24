@@ -363,10 +363,11 @@ def Client_Work(ClientSocket, addr):
 #            ClientSocket.send(msg_err.encode('utf-8'))
 #            msg_err = ""
 #        else:
-        if msg_output != "":
+        if msg_output == "":
             msg_Usage = "USAGE " + msg_Usage
             ClientSocket.send(msg_Usage.encode('utf-8'))
             msg_Usage = ""
+            msg_output = ""
 
 
 bind_ip = "0.0.0.0"
