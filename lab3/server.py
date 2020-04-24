@@ -52,32 +52,32 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
                     conn.commit()
                     print("USER insertion is success")
-                    msg_output = "SUC " + "Register successfully.\r\n"
+                    msg_output = "SUC " + "Register successfully."
                 else:
                     print("Username is already used")
-                    msg_output = "ERR " + "Username is already used.\r\n"
+                    msg_output = "ERR " + "Username is already used."
                 ClientSocket.send(msg_output.encode('utf-8'))
         ## login
         if msg_input.startswith("login "):
             if len(msg_split) == 3:
                 cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
                 if login > -1:
-                    msg_output = "ERR " + "Please logout first.\r\n"
+                    msg_output = "ERR " + "Please logout first."
                 elif cursor != None and cursor[3] == msg_split[2]: #person is exist
                     print("She is ", cursor[0], cursor[1])
                     login = cursor[0]
-                    msg_output = "SUC " + "Welcome, " + cursor[1] + "\r\n"
+                    msg_output = "SUC " + "Welcome, " + cursor[1]
                 else:   # no such person or password is incorrect
-                    msg_output = "ERR " + "Login failed." + "\r\n"
+                    msg_output = "ERR " + "Login failed."
                 ClientSocket.send(msg_output.encode('utf-8'))
         ## whoami
         if msg_input == "whoami":
             if login > -1:
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
                 print("I am ", cursor[0])
-                msg_output = "SUC " + cursor[1] + "\r\n"
+                msg_output = "SUC " + cursor[1]
             else:
-                msg_output = "ERR " + "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first."
                 print("He didn't login")
             ClientSocket.send(msg_output.encode('utf-8'))
         ## logout
@@ -86,9 +86,9 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
                 login = -1
                 print("Bye from ", cursor[0], "\r\n")
-                msg_output = "SUC " + "Bye, " + cursor[1] + "\r\n"
+                msg_output = "SUC " + "Bye, " + cursor[1]
             else:
-                msg_output = "ERR " + "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first."
             ClientSocket.send(msg_output.encode('utf-8'))
         ## exit
         if msg_input == "exit":
@@ -102,7 +102,7 @@ def Client_Work(ClientSocket, addr):
                 BName = msg_input.replace("create-board ", "", 1)
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                 if login == -1:
-                    msg_output = "ERR " + "Please login first.\r\n"
+                    msg_output = "ERR " + "Please login first."
                 else:
                     BName = msg_input.replace("create-board ", "", 1)
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
@@ -110,10 +110,10 @@ def Client_Work(ClientSocket, addr):
                         cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
                         conn.commit()
                         print("Board insertion is success")
-                        msg_output = "SUC " + "Create board successfully.\r\n"
+                        msg_output = "SUC " + "Create board successfully."
                     else:
                         print("Board is already exist")
-                        msg_output = "ERR " + "Board is already exist\r\n"
+                        msg_output = "ERR " + "Board is already exist."
                 ClientSocket.send(msg_output.encode('utf-8'))
 
 
@@ -141,7 +141,7 @@ def Client_Work(ClientSocket, addr):
                 else:
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))
                 ClientSocket.send(NEG.encode('utf-8'))
 # -------------~ client done
@@ -150,7 +150,7 @@ def Client_Work(ClientSocket, addr):
             if len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
                 no_create = msg_input.replace("create-post ", "", 1)           ## Bname = BoardTitle[0]
                 if login == -1:
-                    msg_output = "ERR " + "Please login first.\r\n"
+                    msg_output = "ERR " + "Please login first."
                 elif msg_split[1] == "--title":                                ## Title = TitleContent[0]
                     print("He did not choose the board")                       ## Content = TitleContent[1]
                 elif msg_split[3] == "--content":
@@ -162,7 +162,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BoardTitle[0],)).fetchone()
                     if cursor == None: #Board is not exist
                         print("Board is not exist")
-                        msg_output = "ERR " + "Board is not exist.\r\n"
+                        msg_output = "ERR " + "Board is not exist."
                     else:
                         print("Board exist")
                         ClientSocket.send(POS.encode('utf-8'))
@@ -172,9 +172,9 @@ def Client_Work(ClientSocket, addr):
                             cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
                             conn.commit()
                             print(NowTime, type(NowTime), "POST insertion is success")
-                            msg_output = "SUC " + "Create post successfully.\r\n"
+                            msg_output = "SUC " + "Create post successfully."
                         else:
-                            msg_output = "ERR " + "FAILD.\r\n"
+                            msg_output = "ERR " + "FAILD."
                 ClientSocket.send(msg_output.encode('utf-8'))
 # -------------^ client done
 
@@ -194,12 +194,10 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                     if cursor == None:                        ## Board is not exist
                         print("Board is not exist")
-                        msg_err = "Board is not exist.\r\n"
+                        msg_err = "Board is not exist."
                     else:
                         print("Board is exist")
                         cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)).fetchone()
-                        # msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                        # ClientSocket.send(msg_output.encode('utf-8'))
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
                             msg_suc = post_Col_name ## "int80" + colname
@@ -207,7 +205,7 @@ def Client_Work(ClientSocket, addr):
                             ClientSocket.send(post_Col_name.encode('utf-8'))
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
                                 print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
-                                msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                                msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n".format(row[0], row[1], row[2], row[3])
                                 ClientSocket.send(msg_output.encode('utf-8'))
                         continue
             ## without keyword

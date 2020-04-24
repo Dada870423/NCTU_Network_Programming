@@ -114,8 +114,8 @@ def CBOARD(CMD):
 
 def LBOARD(CMD):
     print(board_Col_name)
-    FLAG = 0
-    while FLAG != 4:
+    FLAG = 5
+    while FLAG == 5:
         get = s.recv(1024).decode('utf-8')
         FLAG = INT_handling(int_msg = get)
 
@@ -155,7 +155,7 @@ while True:
     elif cmd.startswith("create-board"):
         CBOARD(CMD = cmd)
     elif cmd.startswith("list-board"):
-        CBOARD(CMD = cmd)    
+        LBOARD(CMD = cmd)    
     else:
         get = s.recv(1024).decode('utf-8')
         INT_handling(int_msg = get)
