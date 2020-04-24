@@ -129,7 +129,7 @@ def Client_Work(ClientSocket, addr):
                 else:
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))   
                 ClientSocket.send(NEG.encode('utf-8'))
             elif hashtag in HBName: ## with keyword

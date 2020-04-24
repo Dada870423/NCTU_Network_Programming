@@ -54,8 +54,10 @@ def INT_handling(int_msg):
 
 def CmdLine():
     cmd = input("% ")
-    while cmd == "":
+    test = cmd.replace(' ', '')
+    while test == "":
         cmd = input("% ")
+        test = cmd.replace(' ', '')
     s.send(cmd.encode('utf-8'))
     return cmd
 
