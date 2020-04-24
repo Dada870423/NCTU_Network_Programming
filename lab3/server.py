@@ -29,6 +29,8 @@ def Client_Work(ClientSocket, addr):
     hashtag = "##"
     TITLE = " --title "
     CONTENT = " --content "
+    POS = "POS"
+    NEG = "NEG"
     board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
     post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
     conn = sqlite3.connect('BBS.db')
@@ -93,23 +95,26 @@ def Client_Work(ClientSocket, addr):
             print("the client ", login," want to bye")
             ClientSocket.close()
             break
-# ------------- Lab1 done
+# -------------^ client done
         ## create-board
         if msg_input.startswith("create-board "):
-            if login == -1:
-                msg_output = "ERR " + "Please login first.\r\n"
-            elif len(msg_split) > 1:
+            if len(msg_split) > 1:
                 BName = msg_input.replace("create-board ", "", 1)
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
-                if cursor == None:
-                    cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
-                    conn.commit()
-                    print("Board insertion is success")
-                    msg_output = "SUC " + "Create board successfully.\r\n"
+                if login == -1:
+                    msg_output = "ERR " + "Please login first.\r\n"
                 else:
-                    print("Board is already exist")
-                    msg_output = "ERR " + "Board is already exist\r\n"
-        
+                    BName = msg_input.replace("create-board ", "", 1)
+                    cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
+                    if cursor == None:
+                        cursor = c.execute('INSERT INTO BOARDS ("BName", "Uid") VALUES (?, ?) ', (BName, login))
+                        conn.commit()
+                        print("Board insertion is success")
+                        msg_output = "SUC " + "Create board successfully.\r\n"
+                    else:
+                        print("Board is already exist")
+                        msg_output = "ERR " + "Board is already exist\r\n"
+                ClientSocket.send(msg_output.encode('utf-8'))
 
 
 
@@ -143,13 +148,15 @@ def Client_Work(ClientSocket, addr):
                         msg_output = "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                         ClientSocket.send(msg_output.encode('utf-8'))
                 continue
+        
+# -------------~ client done
         ## create the post & file of comment
         if msg_input.startswith("create-post "):                             
-            if login == -1:
-                msg_err = "Please login first.\r\n"
-            elif len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
+            if len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
                 no_create = msg_input.replace("create-post ", "", 1)           ## Bname = BoardTitle[0]
-                if msg_split[1] == "--title":                                  ## Title = TitleContent[0]
+                if login == -1:
+                    msg_output = "ERR " + "Please login first.\r\n"
+                elif msg_split[1] == "--title":                                ## Title = TitleContent[0]
                     print("He did not choose the board")                       ## Content = TitleContent[1]
                 elif msg_split[3] == "--content":
                     print("He did not name the title")
@@ -160,21 +167,23 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BoardTitle[0],)).fetchone()
                     if cursor == None: #Board is not exist
                         print("Board is not exist")
-                        msg_err = "Board is not exist.\r\n"
+                        msg_output = "ERR " + "Board is not exist.\r\n"
                     else:
                         print("Board exist")
-                        NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
-                        cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
-                        conn.commit()
-                        print(NowTime, type(NowTime), "POST insertion is success")
-                        msg_suc = "Create post successfully.\r\n"
-                        DIR = 'data/post'
-                        P_num = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) 
-                        cnt = TitleContent[1].split("<br>")
-                        os.system("echo "" >> data/comment/{}".format(P_num+1))
-                        for iter_cnt in cnt:
-                            print(iter_cnt)
-                            os.system("echo {} >> data/post/{}".format(iter_cnt, P_num+1))
+                        ClientSocket.send(POS.encode('utf-8'))
+                        CBRES = ClientSocket.recv(1024).decode('utf-8')
+                        if CBRES.startswith("POS"):
+                            NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
+                            cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
+                            conn.commit()
+                            print(NowTime, type(NowTime), "POST insertion is success")
+                            msg_output = "SUC " + "Create post successfully.\r\n"
+                        else:
+                            msg_output = "ERR " + "FAILD.\r\n"
+                ClientSocket.send(msg_output.encode('utf-8'))
+# -------------^ client done
+
+
         ## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "", 1)

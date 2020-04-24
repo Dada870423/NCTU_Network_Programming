@@ -1,18 +1,28 @@
 import socket
 
 
+POS = "POS"
+NEG = "NEG"
+
+
 def INT_handling(int_msg):
     response = -1
     if int_msg.startswith("SUC"):
     	int_msg = int_msg.replace("SUC ", "", 1)
     	response = 0
+    	print(int_msg)
     elif int_msg.startswith("ERR"):
     	int_msg = int_msg.replace("ERR ", "", 1)
     	response = 1
+    	print(int_msg)
     elif int_msg.startswith("USAGE"):
     	int_msg = int_msg.replace("USAGE ", "", 1)
     	response = 2
-    print(int_msg)
+    	print(int_msg)
+    elif int_msg.startswith("POS"):
+    	response = 3
+    elif int_msg.startswith("NEG"):
+    	response = 4
     return response
 
     
@@ -62,9 +72,19 @@ def LOGOUT(CMD):
     get = s.recv(1024).decode('utf-8')
     response = INT_handling(int_msg = get)
 
+def CBOARD(CMD):
+    get = s.recv(1024).decode('utf-8')
+    response = INT_handling(int_msg = get)
+    if response == 3:
+        gogo_S3 = 1
+    	## S3
 
 
-
+        ## S3 done
+        ### if s3 success then
+    	###    s.send(POS.encode('utf-8'))
+        get = s.recv(1024).decode('utf-8')
+        response1 = INT_handling(int_msg = get)
 
 
 
@@ -84,7 +104,7 @@ print (welcome)
 Get_Input = 1
 
 get = "" ## get is return msg from server
-for i in range(10):
+while True:
     cmd = CmdLine()
 
 
@@ -98,8 +118,10 @@ for i in range(10):
         WHOAMI(CMD = cmd)
     elif cmd.startswith("logout"):
         LOGOUT(CMD = cmd)
+    elif cmd.startswith("create-board"):
+        CBOARD(CMD = cmd)
     else:
         get = s.recv(1024).decode('utf-8')
-        INT_handling(int_msg = cmd)
+        INT_handling(int_msg = get)
 
 
