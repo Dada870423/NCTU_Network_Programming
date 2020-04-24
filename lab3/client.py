@@ -99,7 +99,7 @@ for i in range(10):
     elif cmd.startswith("logout"):
         LOGOUT(CMD = cmd)
     else:
-    	get = s.recv(1024).decode('utf-8')
+        get = s.recv(1024).decode('utf-8')
         INT_handling(int_msg = cmd)
 
 
