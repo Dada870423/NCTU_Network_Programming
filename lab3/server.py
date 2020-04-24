@@ -151,8 +151,8 @@ def Client_Work(ClientSocket, addr):
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
-                        ClientSocket.send(msg_output.encode('utf-8'))   
-                ClientSocket.send(NEG.encode('utf-8'))
+                        SEND(CMD = msg_output)
+                SEND(CMD = NEG)
             elif hashtag in HBName: ## with keyword
                 BName = HBName.replace(" ##", "", 1)
                 BName = "%" + BName + "%"
@@ -163,8 +163,8 @@ def Client_Work(ClientSocket, addr):
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
-                        ClientSocket.send(msg_output.encode('utf-8'))
-                ClientSocket.send(NEG.encode('utf-8'))
+                        SEND(CMD = msg_output)
+                SEND(CMD = NEG)
 # -------------~ client done
         ## create the post & file of comment
         if msg_input.startswith("create-post "):                             
