@@ -173,7 +173,9 @@ def CPOST(CMD):
         for iter_cnt in cnt:
             print(iter_cnt)
             os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
+        os.system("echo "" >> ./.data/comment/C{}".format(PID))
         target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
+        target_bucket.upload_file("./.data/comment/C{}".format(PID), "C{}".format(PID))
 
 
 
@@ -190,8 +192,31 @@ def READPOST(CMD):
         print(INFO)
         READtarget_bucket = s3.Bucket(BucketName)
         target_object = READtarget_bucket.Object("P{}".format(Pid)) 
-        object_content = target_object.get()['Body'].read().decode()
-        print("--", object_content, "--")
+        object_content = target_object.get()["Body"].read().decode()
+        target_object = READtarget_bucket.Object("C{}".format(Pid)) 
+        object_comment = target_object.get()["Body"].read().decode()
+        print("--\n\r", object_content)
+        print("--\n\r", object_comment)
+
+
+
+def COMMENT(CMD):
+    get = RECEIVE()
+    response, BucketSucMsg = INT_handling(int_msg = get)
+    
+    if response == 6:
+        msg_split = CMD.split(" ")
+        PID = msg_split[1]
+        starts = "comment " + PID + " "
+        Ccomment = CMD.replace(starts, "", 1)
+
+        BucketSucMsg = BucketSucMsg.split("# #")
+        Ctarget_bucket = BucketSucMsg[0]
+        Cname = BucketSucMsg[1]
+        print(BucketSucMsg[2])
+
+        os.system("echo {:<20} : {:<20} >> ./.data/comment/C{}".format(Cname, Ccomment, PID))
+        target_bucket.upload_file("./.data/comment/C{}".format(PID), "C{}".format(PID))
 
 
 
@@ -237,7 +262,9 @@ while True:
     elif cmd.startswith("list-post"):
         LPOST(CMD = cmd)
     elif cmd.startswith("read"):
-        READPOST(CMD = cmd) 
+        READPOST(CMD = cmd)
+    elif cmd.startswith("read"):
+        COMMENT(CMD = cmd) 
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)

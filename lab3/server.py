@@ -275,7 +275,7 @@ def Client_Work(ClientSocket, addr):
                 SEND(CMD = msg_output)
             else:
                 cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
-                print(cursor[0], cursor[1], cursor[2], cursor[3])
+                print(cursor[0], cursor[1], cursor[2], cursor[3]) ##cursor[3] is BucketName
                 msg_output = "TROBLE " + cursor[3] + "# #" + "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
                 SEND(CMD = msg_output)
 
@@ -315,12 +315,14 @@ def Client_Work(ClientSocket, addr):
         ## update the post
         if msg_input.startswith("update-post ") and len(msg_split) > 2:
             if login == -1:
-                msg_err = "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first.\r\n"
+                SEND(CMD = msg_output)
             else:
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_err = "Post is not exist.\r\n"
+                    msg_output = "Post is not exist.\r\n"
+                    SEND(CMD = msg_output)
                 elif cursor[3] != login:
                     print("Owner is:",  cursor[3])
                     msg_err = "Not the post owner.\r\n"
@@ -340,22 +342,28 @@ def Client_Work(ClientSocket, addr):
                         os.system("echo {} >> data/post/{}".format(iter_cnt, msg_split[1]))
                     msg_suc = "Update successfully.\r\n"
         ## comment
-        if msg_input.startswith("comment ") and len(msg_split) > 1:
+        if msg_input.startswith("comment ") and len(msg_split) > 2:
             if login == -1:
-                msg_err = "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first.\r\n"
+                SEND(CMD = msg_output)
             else:
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_err = "Post is not exist.\r\n"
+                    msg_err = "ERR " + "Post is not exist.\r\n"
+                    SEND(CMD = msg_output)
                 else:
-                    cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
-                    Cname = cursor[1]
                     starts = "comment " + msg_split[1] + " "
                     Ccomment = msg_input.replace(starts, "", 1)
+
+                    cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
+                    Cname = cursor[1]
                     print("I am ", Cname, "and i want to comment", Ccomment, "in", msg_split[1])
-                    os.system("echo {:<20} : {:<20} >> data/comment/{}".format(Cname, Ccomment, msg_split[1]))
-                    msg_suc = "Comment successfully.\r\n"
+                    cursor = c.execute("SELECT USERS.Username, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()          
+                    print(cursor[1])
+                    msg_output = "TROBLE " + cursor[1] + "# #" + Cname + "# #" + "Comment successfully.\r\n"
+                    SEND(CMD = msg_output)
+
 
         ## Command not found
         if msg_input.startswith("register"):
