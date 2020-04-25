@@ -214,7 +214,7 @@ def Client_Work(ClientSocket, addr):
         ## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "", 1)
-            msg_output = "DATA "
+            
             ## with keyword
             if hashtag in BName: 
                 if msg_split[1].startswith("##"):
@@ -235,6 +235,7 @@ def Client_Work(ClientSocket, addr):
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
                         else:
+                            msg_output = "DATA "
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
                                 print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                                 msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n".format(row[0], row[1], row[2], row[3])
@@ -253,6 +254,7 @@ def Client_Work(ClientSocket, addr):
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
                     else:
+                        msg_output = "DATA "
                         for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
                             print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
                             msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
