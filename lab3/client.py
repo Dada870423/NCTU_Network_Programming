@@ -94,10 +94,11 @@ def REG(CMD):
         BucketName = CBucketName()
         s3.create_bucket(Bucket = BucketName)
         SEND(CMD = BucketName)
+        get = RECEIVE()
+        INT_handling(int_msg = get)  
     else:
         pass
-    get = RECEIVE()
-    INT_handling(int_msg = get)    
+   
 
 
 
