@@ -216,7 +216,8 @@ def COMMENT(CMD):
         print(BucketSucMsg[2])
 
         os.system("echo {:<20} : {:<20} >> ./.data/comment/C{}".format(Cname, Ccomment, PID))
-        target_bucket.upload_file("./.data/comment/C{}".format(PID), "C{}".format(PID))
+        POSTtarget_bucket = s3.Bucket(Ctarget_bucket)
+        POSTtarget_bucket.upload_file("./.data/comment/C{}".format(PID), "C{}".format(PID))
 
 
 
