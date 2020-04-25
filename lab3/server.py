@@ -200,20 +200,15 @@ def Client_Work(ClientSocket, addr):
                     else:
                         print("Board exist")
 
+
+                        CBRES.startswith("POS"):
+                        NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
+                        cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
+                        conn.commit()
                         Last_post = c.execute('SELECT * FROM POSTS WHERE TITLE = ?', (TitleContent[0],)).fetchall()
                         PID = str(Last_post[-1][0])
-
-                        msg_output = POS + PID ## PID ## 
-                        SEND(CMD = msg_output)
-                        CBRES = RECEIVE()
-                        if CBRES.startswith("POS"):
-                            NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
-                            cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
-                            conn.commit()
-                            print(NowTime, type(NowTime), "POST insertion is success")
-                            msg_output = "TROBLE " + "# #" + "Create post successfully."
-                        else:
-                            msg_output = "ERR " + "FAILD."
+                        print(NowTime, type(NowTime), "POST insertion is success")
+                        msg_output = "TROBLE " + PID + "# #" + "Create post successfully."
                         SEND(CMD = msg_output)
 
 
