@@ -263,7 +263,7 @@ while True:
         LPOST(CMD = cmd)
     elif cmd.startswith("read"):
         READPOST(CMD = cmd)
-    elif cmd.startswith("read"):
+    elif cmd.startswith("comment"):
         COMMENT(CMD = cmd) 
     else:
         get = RECEIVE()
