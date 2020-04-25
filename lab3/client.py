@@ -165,7 +165,7 @@ def CPOST(CMD):
             print(iter_cnt)
             os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
         ## S3
-
+        target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
 
         ## S3 done
 
@@ -210,7 +210,9 @@ while True:
     elif cmd.startswith("list-board"):
         LBOARD(CMD = cmd)
     elif cmd.startswith("create-post"):
-        CPOST(CMD = cmd) 
+        CPOST(CMD = cmd)
+    elif cmd.startswith("list-post"):
+        LPOST(CMD = cmd) 
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)

@@ -200,8 +200,6 @@ def Client_Work(ClientSocket, addr):
                     else:
                         print("Board exist")
 
-
-                        CBRES.startswith("POS"):
                         NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
                         cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
                         conn.commit()
