@@ -182,7 +182,7 @@ def READPOST(CMD):
     response, Info = INT_handling(int_msg = get)
     ## print author done
     if response == 6:
-        RPid = CMD.split("# #")
+        RPid = CMD.split(" ")
         Pid = RPid[1]
         BNameInfo = Info.split("# #")
         BucketName = BNameInfo[0]
