@@ -234,7 +234,7 @@ def UPDATE(CMD):
             os.system("rm ./.data/post/P{}".format(PID))
             for iter_cnt in cnt:
                 print(iter_cnt)
-                os.system("echo {} >> ./.data/post/P{}".format(PID))
+                os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
             target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
 
 
