@@ -71,12 +71,12 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     SEND(CMD = POS)
-                    RRES = RECEIVE()
-                    if RRES != "NEG":
-                        cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
-                        conn.commit()
-                        print("USER insertion is success")
-                        msg_output = "SUC " + "Register successfully."
+                    BucketName = RECEIVE()
+
+                    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password", "BucketName") VALUES (?, ?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3], BucketName))
+                    conn.commit()
+                    print("USER insertion is success")
+                    msg_output = "SUC " + "Register successfully."
                     
                 else:
                     print("Username is already used")

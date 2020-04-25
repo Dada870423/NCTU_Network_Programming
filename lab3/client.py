@@ -92,6 +92,8 @@ def REG(CMD):
         SEND(CMD = bucket_name)
     else:
         pass
+    get = RECEIVE()
+    INT_handling(int_msg = get)    
 
 
 
