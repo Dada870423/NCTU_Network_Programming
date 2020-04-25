@@ -192,9 +192,9 @@ def READPOST(CMD):
         print(INFO)
         READtarget_bucket = s3.Bucket(BucketName)
         target_object1 = READtarget_bucket.Object("P{}".format(Pid)) 
-        object_content = target_object.get()["Body"].read().decode()
+        object_content = target_object1.get()["Body"].read().decode()
         target_object2 = READtarget_bucket.Object("C{}".format(Pid)) 
-        object_comment = target_object.get()["Body"].read().decode()
+        object_comment = target_object2.get()["Body"].read().decode()
         print(object_content)
         print("--\n\r", object_comment)
 
