@@ -93,7 +93,7 @@ def Client_Work(ClientSocket, addr):
                     if cursor != None and cursor[3] == msg_split[2]: #person is exist
                         print("She is ", cursor[0], cursor[1])
                         login = cursor[0]
-                        msg_output = "LOGIN " + cursor[4] + "# #" + "Welcome, " + cursor[1] 
+                        msg_output = "TROBLE " + cursor[4] + "# #" + "Welcome, " + cursor[1] 
                         SEND(CMD = msg_output)
                     else:   # no such person or password is incorrect
                         msg_output = "ERR " + "Login failed."
@@ -211,7 +211,7 @@ def Client_Work(ClientSocket, addr):
                             cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
                             conn.commit()
                             print(NowTime, type(NowTime), "POST insertion is success")
-                            msg_output = "SUC " + "Create post successfully."
+                            msg_output = "TROBLE " + "# #" + "Create post successfully."
                         else:
                             msg_output = "ERR " + "FAILD."
                         SEND(CMD = msg_output)

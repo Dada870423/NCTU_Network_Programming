@@ -14,14 +14,14 @@ post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n".format("ID", "Title", "Author", 
 s3 = boto3.resource('s3')
 
 def MKDIR():
-    Fdata = "./.data"
-    Fpost = "./.data/post"
-    Fcomment = "./.data/comment"
+    Pdata = "./.data"
+    Ppost = "./.data/post"
+    Pcomment = "./.data/comment"
 
     try:
-      os.makedirs(Fdata)
-      os.makedirs(Fpost)
-      os.makedirs(Fcomment)
+      os.makedirs(Pdata)
+      os.makedirs(Ppost)
+      os.makedirs(Pcomment)
     except FileExistsError:
       return
 
@@ -61,9 +61,10 @@ def INT_handling(int_msg):
     elif int_msg.startswith("DATA"):
         int_msg = int_msg.replace("DATA ", "", 1)
         response  = 5
-    elif int_msg.startswith("LOGIN"):
-        int_msg = int_msg.replace("LOGIN ", "", 1)
+    elif int_msg.startswith("TROBLE"):
+        int_msg = int_msg.replace("TROBLE ", "", 1)
         return 6, int_msg
+
     print(int_msg)
     return response, int_msg
 
@@ -141,6 +142,7 @@ def LBOARD(CMD):
 
 
 def Get_BTC(CMD):
+    CMD = CMD.replace("create-post ", "", 1) 
     BoardTitle = CMD.split(" --title ")                   
     TitleContent = BoardTitle[1].split(" --content ")
     Board = BoardTitle[0]
@@ -151,21 +153,23 @@ def Get_BTC(CMD):
 
 def CPOST(CMD):
     get = RECEIVE()
-    response, PID = INT_handling(int_msg = get)
-    print(PID)
-    if response == 300000:
+    response, PidSMsg = INT_handling(int_msg = get)
+    PidSMsg = PidSMsg.split("# #")
+    PID = PidSMsg[0]
+    print(PidSMsg[1])
+    print("PID is : ", PID)
+    if response == 3:
         Board, Title, Content = Get_BTC(CMD = CMD)
         cnt = TitleContent[1].split("<br>")
-        print(respond)
-        # os.system("echo "" >> data/comment/{}".format(P_num+1))
+        for iter_cnt in cnt:
+            print(iter_cnt)
+            os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
         ## S3
 
 
         ## S3 done
 
-        SEND(CMD = POS)
-        get1 = RECEIVE()
-        INT_handling(int_msg = get1)
+
 
 
 
