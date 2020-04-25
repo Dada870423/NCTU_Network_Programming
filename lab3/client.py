@@ -64,6 +64,7 @@ def INT_handling(int_msg):
     elif int_msg.startswith("LOGIN"):
         int_msg = int_msg.replace("LOGIN ", "", 1)
         LoginHandling(BWN = int_msg)
+        print("end")
         return 6
     print(int_msg)
     return response
