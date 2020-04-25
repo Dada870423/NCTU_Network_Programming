@@ -214,6 +214,7 @@ def Client_Work(ClientSocket, addr):
         ## list the post with ## or not
         if msg_input.startswith("list-post "): 
             BName = msg_input.replace("list-post ", "", 1)
+            msg_output = "DATA "
             ## with keyword
             if hashtag in BName: 
                 if msg_split[1].startswith("##"):
@@ -226,41 +227,37 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                     if cursor == None:                        ## Board is not exist
                         print("Board is not exist")
-                        msg_err = "Board is not exist."
+                        msg_output = "ERR " + "Board is not exist."
+                        SEND(CMD = msg_output)
                     else:
                         print("Board is exist")
                         cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)).fetchone()
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
-                            msg_suc = post_Col_name ## "int80" + colname
                         else:
-                            ClientSocket.send(post_Col_name.encode('utf-8'))
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
                                 print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
-                                msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n".format(row[0], row[1], row[2], row[3])
-                                ClientSocket.send(msg_output.encode('utf-8'))
-                        continue
+                                msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n".format(row[0], row[1], row[2], row[3])
+                            SEND(CMD = msg_output)
             ## without keyword
             else:  
                 print("Want to search in ", BName, " Board")
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                 if cursor == None:                        ## Board is not exist
                     print("Board is not exist")
-                    msg_err = "Board is not exist.\r\n"
+                    msg_output = "ERR " + "Board is not exist.\r\n"
+                    SEND(CMD = msg_output)
                 else:
                     print("Board is exist")
                     cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )).fetchone()
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
-                        msg_output = "int80 " + post_Col_name
-                        ClientSocket.send(msg_output.encode('utf-8'))
                     else:
-                        ClientSocket.send(post_Col_name.encode('utf-8'))
                         for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
                             print("{:>5} {:^20} {:^20} {:^9}".format(row[0], row[1], row[2], row[3]))
-                            msg_output = "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
-                            ClientSocket.send(msg_output.encode('utf-8'))
-                    continue
+                            msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                        SEND(CMD = msg_output)
+
         ## read post and read comment
         if len(msg_split) == 2 and msg_split[0] == "read":
             cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
@@ -290,20 +287,21 @@ def Client_Work(ClientSocket, addr):
         ## delete the post
         if len(msg_split) == 2 and msg_split[0] == "delete-post":
             if login == -1:
-                msg_err = "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first.\r\n"
             else:
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_err = "Post is not exist.\r\n"
+                    msg_output = "ERR " + "Post is not exist.\r\n"
                 elif cursor[3] != login:
                     print("Owner is:",  cursor[3])
-                    msg_err = "Not the post owner.\r\n"
+                    msg_err = "ERR " + "Not the post owner.\r\n"
                 else:
                     cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
                     conn.commit()
                     print("POST delete is success")
-                    msg_suc = "Delete successfully.\r\n"
+                    msg_suc = "SUC " + "Delete successfully.\r\n"
+            SEND(CMD = msg_output)
         ## update the post
         if msg_input.startswith("update-post ") and len(msg_split) > 2:
             if login == -1:

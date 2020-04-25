@@ -141,6 +141,11 @@ def LBOARD(CMD):
     get = RECEIVE()
     INT_handling(int_msg = get)
 
+def LPOST(CMD):
+    print(post_Col_name)
+    get = RECEIVE()
+    INT_handling(int_msg = get)
+
 
 def Get_BTC(CMD):
     CMD = CMD.replace("create-post ", "", 1) 
