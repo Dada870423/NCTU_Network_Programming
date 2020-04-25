@@ -104,7 +104,8 @@ def REG(CMD):
 def LOGIN(CMD):
     get = RECEIVE()	
     response, BWN = INT_handling(int_msg = get)
-    LoginHandling(BWN = BWN)
+    if response == 6:
+        LoginHandling(BWN = BWN)
 
 def LoginHandling(BWN):
     BN_WEL = BWN.split("# #") 
