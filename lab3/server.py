@@ -175,7 +175,7 @@ def Client_Work(ClientSocket, addr):
                         msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
-# -------------^ client done
+
 
         ## create the post & file of comment
         if msg_input.startswith("create-post "):         
@@ -234,6 +234,7 @@ def Client_Work(ClientSocket, addr):
                         cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)).fetchone()
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
+                            SEND(CMD = NEG)
                         else:
                             msg_output = "DATA "
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
@@ -253,6 +254,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )).fetchone()
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
+                        SEND(CMD = NEG)
                     else:
                         msg_output = "DATA "
                         for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )):
@@ -260,32 +262,36 @@ def Client_Work(ClientSocket, addr):
                             msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
                         SEND(CMD = msg_output)
 
+# -------------^ client done
+
         ## read post and read comment
         if len(msg_split) == 2 and msg_split[0] == "read":
             cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
             if cursor == None:
                 print(cursor, "Post is not exist.")
-                msg_err = "Post is not exist.\r\n"
+                msg_output = "ERR " + "Post is not exist.\r\n"
+                SEND(CMD = msg_output)
             else:
-                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
-                print(cursor[0], cursor[1], cursor[2])
-                msg_output = "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
-                ClientSocket.send(msg_output.encode('utf-8'))
-                PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
-                Rcontent = PostPtr.readlines()
-                for i in range(len(Rcontent)):
-                    msg_output = Rcontent[i] + "\r"
-                    ClientSocket.send(msg_output.encode('utf-8'))
-                msg_output = "--"
-                ClientSocket.send(msg_output.encode('utf-8'))
-                CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
-                Rcomment = CommentPtr.readlines()
-                for i in range(len(Rcomment)):
-                    msg_output = Rcomment[i] + "\r"
-                    ClientSocket.send(msg_output.encode('utf-8'))
-                msg_output = "\r\n"
-                ClientSocket.send(msg_output.encode('utf-8'))
-                continue
+                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
+                print(cursor[0], cursor[1], cursor[2], cursor[3])
+                msg_output = "TROBLE " + cursor[3] + "# #" + "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                SEND(CMD = msg_output)
+
+                #PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
+                #Rcontent = PostPtr.readlines()
+                #for i in range(len(Rcontent)):
+                #    msg_output = Rcontent[i] + "\r"
+                #    ClientSocket.send(msg_output.encode('utf-8'))
+                #msg_output = "--"
+                #ClientSocket.send(msg_output.encode('utf-8'))
+                #CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
+                #Rcomment = CommentPtr.readlines()
+                #for i in range(len(Rcomment)):
+                #    msg_output = Rcomment[i] + "\r"
+                #    ClientSocket.send(msg_output.encode('utf-8'))
+                #msg_output = "\r\n"
+                #ClientSocket.send(msg_output.encode('utf-8'))
+                #continue
         ## delete the post
         if len(msg_split) == 2 and msg_split[0] == "delete-post":
             if login == -1:
@@ -297,12 +303,12 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "ERR " + "Post is not exist.\r\n"
                 elif cursor[3] != login:
                     print("Owner is:",  cursor[3])
-                    msg_err = "ERR " + "Not the post owner.\r\n"
+                    msg_output = "ERR " + "Not the post owner.\r\n"
                 else:
                     cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
                     conn.commit()
                     print("POST delete is success")
-                    msg_suc = "SUC " + "Delete successfully.\r\n"
+                    msg_output = "SUC " + "Delete successfully.\r\n"
             SEND(CMD = msg_output)
         ## update the post
         if msg_input.startswith("update-post ") and len(msg_split) > 2:

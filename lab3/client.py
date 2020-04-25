@@ -138,13 +138,13 @@ def CBOARD(CMD):
 
 def LBOARD(CMD):
     get = RECEIVE()
-    if get.startswith("DATA"):
+    if get.startswith("DATA") or get.startswith("NEG"):
         print(board_Col_name)
     INT_handling(int_msg = get)
 
 def LPOST(CMD):
     get = RECEIVE()
-    if get.startswith("DATA"):
+    if get.startswith("DATA") or get.startswith("NEG"):
         print(post_Col_name)
     INT_handling(int_msg = get)
 
@@ -173,11 +173,25 @@ def CPOST(CMD):
         for iter_cnt in cnt:
             print(iter_cnt)
             os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
-        ## S3
         target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
 
-        ## S3 done
 
+
+def READPOST(CMD):
+    get = RECEIVE()
+    response, Info = INT_handling(int_msg = get)
+    ## print author done
+    if response == 6:
+        RPid = CMD.split("# #")
+        Pid = RPid[1]
+        BNameInfo = Info.split("# #")
+        BucketName = BNameInfo[0]
+        INFO = BNameInfo[0]
+        print(INFO)
+        target_bucket = s3.Bucket(BucketName)
+        target_object = target_bucket.Object("P{}".format(BNameInfo)) 
+        object_content = target_object.get()["Body"].read().decode()
+        print("--", object_content, "--")
 
 
 
@@ -221,7 +235,9 @@ while True:
     elif cmd.startswith("create-post"):
         CPOST(CMD = cmd)
     elif cmd.startswith("list-post"):
-        LPOST(CMD = cmd) 
+        LPOST(CMD = cmd)
+    elif cmd.startswith("read"):
+        READPOST(CMD = cmd) 
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)
