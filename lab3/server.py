@@ -149,7 +149,7 @@ def Client_Work(ClientSocket, addr):
 
         ## To list the board
         if msg_input.startswith("list-board"): 
-            msg_output = "DATA "
+            
             HBName = msg_input.replace("list-board", "", 1)
             if msg_input == "list-board": ## without keyword
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
@@ -157,6 +157,7 @@ def Client_Work(ClientSocket, addr):
                     print(cursor)
                     SEND(CMD = NEG)
                 else:
+                    msg_output = "DATA "
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
@@ -170,6 +171,7 @@ def Client_Work(ClientSocket, addr):
                     print(cursor)
                     SEND(CMD = NEG)
                 else:
+                    msg_output = "DATA "
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
                         msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
