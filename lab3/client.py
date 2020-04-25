@@ -128,6 +128,7 @@ def CBOARD(CMD):
 
 def LBOARD(CMD):
     print(board_Col_name)
+    get = RECEIVE()
     response = INT_handling(int_msg = get)
 
 
