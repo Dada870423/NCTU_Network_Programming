@@ -58,7 +58,7 @@ def INT_handling(int_msg):
     elif int_msg.startswith("DATA"):
         int_msg = int_msg.replace("DATA ", "", 1)
         response  = 5
-    print(int_msg)
+    print(int_msg, "fuck")
     return response
 
     
@@ -134,7 +134,7 @@ def LBOARD(CMD):
 
 
 
-HOST = '52.87.247.141'
+HOST = '3.84.34.171'
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

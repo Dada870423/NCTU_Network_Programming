@@ -19,7 +19,7 @@ def Client_Work(ClientSocket, addr):
         while True:
             try:
                 ClientSocket.send(CMD.encode('utf-8'))
-                break
+                return "Send_suc"
             except:
                 pass
 
@@ -155,7 +155,6 @@ def Client_Work(ClientSocket, addr):
                         msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
-                SEND(CMD = NEG)
             elif hashtag in HBName: ## with keyword
                 BName = HBName.replace(" ##", "", 1)
                 BName = "%" + BName + "%"
