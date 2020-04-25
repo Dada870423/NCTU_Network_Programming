@@ -112,6 +112,7 @@ def LoginHandling(BWN):
     BN_WEL = BWN.split("##") 
     print(BN_WEL[1])
     target_bucket = s3.Bucket(BN_WEL[0])
+    print(fuck, BN_WEL[0])
     return BN_WEL[0]
 
 
