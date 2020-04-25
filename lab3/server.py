@@ -350,7 +350,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_err = "ERR " + "Post is not exist.\r\n"
+                    msg_output = "ERR " + "Post is not exist.\r\n"
                     SEND(CMD = msg_output)
                 else:
                     starts = "comment " + msg_split[1] + " "

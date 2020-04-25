@@ -191,11 +191,11 @@ def READPOST(CMD):
         INFO = BNameInfo[1]
         print(INFO)
         READtarget_bucket = s3.Bucket(BucketName)
-        target_object = READtarget_bucket.Object("P{}".format(Pid)) 
+        target_object1 = READtarget_bucket.Object("P{}".format(Pid)) 
         object_content = target_object.get()["Body"].read().decode()
-        target_object = READtarget_bucket.Object("C{}".format(Pid)) 
+        target_object2 = READtarget_bucket.Object("C{}".format(Pid)) 
         object_comment = target_object.get()["Body"].read().decode()
-        print("--\n\r", object_content)
+        print(object_content)
         print("--\n\r", object_comment)
 
 
@@ -203,7 +203,7 @@ def READPOST(CMD):
 def COMMENT(CMD):
     get = RECEIVE()
     response, BucketSucMsg = INT_handling(int_msg = get)
-    
+    print("res: ", response)
     if response == 6:
         msg_split = CMD.split(" ")
         PID = msg_split[1]
