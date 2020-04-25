@@ -24,7 +24,7 @@ def Client_Work(ClientSocket, addr):
                 pass
 
 
-
+    ClientSocket.setblocking(0)
     
 
 
@@ -142,17 +142,19 @@ def Client_Work(ClientSocket, addr):
 
         ## To list the board
         if msg_input.startswith("list-board"): 
+            msg_output = "DATA "
             HBName = msg_input.replace("list-board", "", 1)
             if msg_input == "list-board": ## without keyword
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
                 if cursor == None:
                     print(cursor)
+                    SEND(CMD = NEG)
                 else:
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
-                        SEND(CMD = msg_output)
-                        msg_output = ""
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
+                    SEND(CMD = msg_output)
+
                 SEND(CMD = NEG)
             elif hashtag in HBName: ## with keyword
                 BName = HBName.replace(" ##", "", 1)
@@ -160,12 +162,13 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )).fetchone()
                 if cursor == None:
                     print(cursor)
+                    SEND(CMD = NEG)
                 else:
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = "DATA " + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
-                        SEND(CMD = msg_output)
-                SEND(CMD = NEG)
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
+                    SEND(CMD = msg_output)
+
 # -------------~ client done
         ## create the post & file of comment
         if msg_input.startswith("create-post "):         
@@ -400,7 +403,7 @@ bind_port = 1031
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
 server.bind((bind_ip,bind_port))
-server.setblocking(0)
+
 server.listen(17)
 print ("[*] Listening on  ", bind_ip,  bind_port)
 

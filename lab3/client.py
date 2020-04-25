@@ -13,12 +13,12 @@ post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Autho
 def MKDIR():
     Fdata = "./.data"
     Fpost = "./.data/post"
-    Cpost = "./.data/comment"
+    Fcomment = "./.data/comment"
 
     try:
       os.makedirs(Fdata)
       os.makedirs(Fpost)
-      os.makedirs(Cpost)
+      os.makedirs(Fcomment)
     except FileExistsError:
       return
 
@@ -128,11 +128,7 @@ def CBOARD(CMD):
 
 def LBOARD(CMD):
     print(board_Col_name)
-    FLAG = 5
-    while FLAG == 5:
-        get = RECEIVE()
-        FLAG = INT_handling(int_msg = get)
-        print("FLag - ", FLAG)
+    response = INT_handling(int_msg = get)
 
 
 
