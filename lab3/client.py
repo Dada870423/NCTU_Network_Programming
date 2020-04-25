@@ -9,7 +9,8 @@ POS = "POS"
 NEG = "NEG"
 board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-s3 = boto3.resource("s3")
+
+s3 = boto3.resource('s3')
 
 def MKDIR():
     Fdata = "./.data"
@@ -78,16 +79,17 @@ def CmdLine():
 
 def CBucketName():
     ti = str(time.time())
-    BucketName = "NetProLab3qsefthuk" + ti
+    BucketName = "netprolab3qsefthuk" + ti
     return BucketName
 
 
 def REG(CMD):
     get = RECEIVE()
     response = INT_handling(int_msg = get)
-    if response == 1:
-        BucketName = CBucketName()
-        s3.create_bucket(Bucket = BucketName)
+    if response == 3:
+        bucket_name = CBucketName()
+        s3.create_bucket(Bucket = bucket_name)
+        SEND(CMD = bucket_name)
     else:
         pass
 

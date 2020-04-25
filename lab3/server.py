@@ -70,10 +70,14 @@ def Client_Work(ClientSocket, addr):
             if len(msg_split) == 4:
                 cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
-                    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
-                    conn.commit()
-                    print("USER insertion is success")
-                    msg_output = "SUC " + "Register successfully."
+                    SEND(CMD = POS)
+                    RRES = RECEIVE()
+                    if RRES != "NEG":
+                        cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password") VALUES (?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3]))
+                        conn.commit()
+                        print("USER insertion is success")
+                        msg_output = "SUC " + "Register successfully."
+                    
                 else:
                     print("Username is already used")
                     msg_output = "ERR " + "Username is already used."
@@ -190,7 +194,7 @@ def Client_Work(ClientSocket, addr):
                         msg_output = "ERR " + "Board is not exist."
                     else:
                         print("Board exist")
-                        ClientSocket.send(POS.encode('utf-8'))
+                        SEND(CMD = POS)
                         CBRES = ClientSocket.recv(1024).decode('utf-8')
                         if CBRES.startswith("POS"):
                             NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
