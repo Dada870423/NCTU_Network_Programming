@@ -249,7 +249,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                 if cursor == None:                        ## Board is not exist
                     print("Board is not exist")
-                    msg_output = "ERR " + "Board is not exist.\r\n"
+                    msg_output = "ERR " + "Board is not exist."
                     SEND(CMD = msg_output)
                 else:
                     print("Board is exist")
@@ -271,7 +271,7 @@ def Client_Work(ClientSocket, addr):
             cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
             if cursor == None:
                 print(cursor, "Post is not exist.")
-                msg_output = "ERR " + "Post is not exist.\r\n"
+                msg_output = "ERR " + "Post is not exist."
                 SEND(CMD = msg_output)
             else:
                 cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
@@ -279,68 +279,53 @@ def Client_Work(ClientSocket, addr):
                 msg_output = "TROBLE " + cursor[3] + "# #" + "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
                 SEND(CMD = msg_output)
 
-                #PostPtr = open("data/post/{}".format(msg_split[1]), 'r')
-                #Rcontent = PostPtr.readlines()
-                #for i in range(len(Rcontent)):
-                #    msg_output = Rcontent[i] + "\r"
-                #    ClientSocket.send(msg_output.encode('utf-8'))
-                #msg_output = "--"
-                #ClientSocket.send(msg_output.encode('utf-8'))
-                #CommentPtr = open("data/comment/{}".format(msg_split[1]), 'r')
-                #Rcomment = CommentPtr.readlines()
-                #for i in range(len(Rcomment)):
-                #    msg_output = Rcomment[i] + "\r"
-                #    ClientSocket.send(msg_output.encode('utf-8'))
-                #msg_output = "\r\n"
-                #ClientSocket.send(msg_output.encode('utf-8'))
-                #continue
+
         ## delete the post
         if len(msg_split) == 2 and msg_split[0] == "delete-post":
             if login == -1:
-                msg_output = "ERR " + "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first."
             else:
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_output = "ERR " + "Post is not exist.\r\n"
+                    msg_output = "ERR " + "Post is not exist."
                 elif cursor[3] != login:
                     print("Owner is:",  cursor[3])
-                    msg_output = "ERR " + "Not the post owner.\r\n"
+                    msg_output = "ERR " + "Not the post owner."
                 else:
                     cursor = c.execute('DELETE FROM POSTS WHERE PID = ?', (msg_split[1],))
                     conn.commit()
                     print("POST delete is success")
-                    msg_output = "SUC " + "Delete successfully.\r\n"
+                    msg_output = "SUC " + "Delete successfully."
             SEND(CMD = msg_output)
         ## update the post
         if msg_input.startswith("update-post ") and len(msg_split) > 2:
             if login == -1:
-                msg_output = "ERR " + "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first."
                 SEND(CMD = msg_output)
             else:
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_output = "Post is not exist.\r\n"
+                    msg_output = "ERR " + "Post is not exist."
                     SEND(CMD = msg_output)
                 elif cursor[3] != login:
                     print("Owner is:",  cursor[3])
-                    msg_err = "Not the post owner.\r\n"
+                    msg_output = "ERR " + "Not the post owner."
+                    SEND(CMD = msg_output)
                 elif msg_split[2] == "--title":
                     UTitle = msg_input.split(" --title ") 
                     print("I want to update the title, and the new title is:", UTitle[1])	
                     cursor = c.execute('UPDATE POSTS SET TITLE = ? WHERE PID = ?', (UTitle[1], msg_split[1]))
                     conn.commit()
-                    msg_suc = "Update successfully.\r\n"
+                    msg_output = "SUC " + "Update successfully.\r\n"
+                    SEND(CMD = msg_output)
                 elif msg_split[2] == "--content":
                     UContent = msg_input.split(" --content ") 
                     print("I want to update the content, and the new content is:", UContent[1])
-                    cnt = UContent[1].split("<br>")
-                    os.system("rm data/post/{}".format(msg_split[1]))
-                    for iter_cnt in cnt:
-                        print(iter_cnt)
-                        os.system("echo {} >> data/post/{}".format(iter_cnt, msg_split[1]))
-                    msg_suc = "Update successfully.\r\n"
+
+                    msg_output = "SUC " + "Update successfully.\r\n"
+                    SEND(CMD = msg_output)
         ## comment
         if msg_input.startswith("comment ") and len(msg_split) > 2:
             if login == -1:
@@ -350,7 +335,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_output = "ERR " + "Post is not exist.\r\n"
+                    msg_output = "ERR " + "Post is not exist."
                     SEND(CMD = msg_output)
                 else:
                     starts = "comment " + msg_split[1] + " "

@@ -224,15 +224,17 @@ def COMMENT(CMD):
 def UPDATE(CMD):
     get = RECEIVE()
     response, BucketSucMsg = INT_handling(int_msg = get)
-    if response == 0 and msg_split[2] == "--content":
+    if response == 0:
         msg_split = CMD.split(" ")
         PID = msg_split[1]
-        UContent = CMD.split(" --content ") 
-        cnt = UContent[1].split("<br>")
-        os.system("rm ./.data/post/P{}".format(PID))
-        for iter_cnt in cnt:
-            print(iter_cnt)
-            os.system("echo {} >> ./.data/post/P{}".format(PID))
+        if msg_split[2] == "--content":
+        
+            UContent = CMD.split(" --content ") 
+            cnt = UContent[1].split("<br>")
+            os.system("rm ./.data/post/P{}".format(PID))
+            for iter_cnt in cnt:
+                print(iter_cnt)
+                os.system("echo {} >> ./.data/post/P{}".format(PID))
             target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
 
 
