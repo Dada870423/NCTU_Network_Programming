@@ -85,16 +85,19 @@ def Client_Work(ClientSocket, addr):
         ## login
         if msg_input.startswith("login "):
             if len(msg_split) == 3:
-                cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
                 if login > -1:
                     msg_output = "ERR " + "Please logout first."
-                elif cursor != None and cursor[3] == msg_split[2]: #person is exist
-                    print("She is ", cursor[0], cursor[1])
-                    login = cursor[0]
-                    msg_output = "SUC " + "Welcome, " + cursor[1]
-                else:   # no such person or password is incorrect
-                    msg_output = "ERR " + "Login failed."
-                SEND(CMD = msg_output)
+                    SEND(CMD = msg_output)
+                else:
+                    cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (msg_split[1],)).fetchone()
+                    if cursor != None and cursor[3] == msg_split[2]: #person is exist
+                        print("She is ", cursor[0], cursor[1])
+                        login = cursor[0]
+                        msg_output = " LOGIN " + cursor[4] + hashtag + "Welcome, " + cursor[1] 
+                        SEND(CMD = msg_output)
+                    else:   # no such person or password is incorrect
+                        msg_output = "ERR " + "Login failed."
+                        SEND(CMD = msg_output)
         ## whoami
         if msg_input == "whoami":
             if login > -1:

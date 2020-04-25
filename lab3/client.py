@@ -7,6 +7,7 @@ import time
 
 POS = "POS"
 NEG = "NEG"
+target_bucket = None
 board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
 
@@ -60,6 +61,10 @@ def INT_handling(int_msg):
     elif int_msg.startswith("DATA"):
         int_msg = int_msg.replace("DATA ", "", 1)
         response  = 5
+    elif int_msg.startswith("LOGIN"):
+        int_msg = int_msg.replace("LOGIN ", "", 1)
+        LoginHandling(BWN = int_msg)
+        return 6
     print(int_msg)
     return response
 
@@ -100,14 +105,15 @@ def REG(CMD):
 def LOGIN(CMD):
     get = RECEIVE()	
     response = INT_handling(int_msg = get)
-    if response == 1:
-    	gogo_S3 = 1
-    	## S3
+    ## checking in INT
+    ## handling in LoginHandling
 
+def LoginHandling(BWN):
+    BN_WEL = BWN.split("##") 
+    print(BN_WEL[1])
+    target_bucket = s3.Bucket(BN_WEL[0])
+    return BN_WEL[0]
 
-        ## S3 done
-    else:
-    	gogo_S3 = 0
 
 
 def WHOAMI(CMD):
@@ -118,6 +124,7 @@ def WHOAMI(CMD):
 def LOGOUT(CMD):
     get = RECEIVE()
     response = INT_handling(int_msg = get)
+    target_bucket = None
 
 
 def CBOARD(CMD):
