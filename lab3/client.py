@@ -186,11 +186,11 @@ def READPOST(CMD):
         Pid = RPid[1]
         BNameInfo = Info.split("# #")
         BucketName = BNameInfo[0]
-        INFO = BNameInfo[0]
+        INFO = BNameInfo[1]
         print(INFO)
         READtarget_bucket = s3.Bucket(BucketName)
-        target_object = READtarget_bucket.Object("P{}".format(BNameInfo)) 
-        object_content = target_object.get()["Body"].read().decode()
+        target_object = READtarget_bucket.Object("P{}".format(BucketName)) 
+        object_content = target_object.get()['Body'].read().decode()
         print("--", object_content, "--")
 
 
