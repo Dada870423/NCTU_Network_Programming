@@ -137,13 +137,15 @@ def CBOARD(CMD):
 
 
 def LBOARD(CMD):
-    print(board_Col_name)
     get = RECEIVE()
+    if get.startswith("DATA"):
+        print(board_Col_name)
     INT_handling(int_msg = get)
 
 def LPOST(CMD):
-    print(post_Col_name)
     get = RECEIVE()
+    if get.startswith("DATA"):
+        print(post_Col_name)
     INT_handling(int_msg = get)
 
 
