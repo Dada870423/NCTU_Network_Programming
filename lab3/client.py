@@ -154,11 +154,12 @@ def Get_BTC(CMD):
 def CPOST(CMD):
     get = RECEIVE()
     response, PidSMsg = INT_handling(int_msg = get)
-    PidSMsg = PidSMsg.split("# #")
-    PID = PidSMsg[0]
-    print(PidSMsg[1])
-    print("PID is : ", PID)
+    
     if response == 6:
+        PidSMsg = PidSMsg.split("# #")
+        PID = PidSMsg[0]
+        print(PidSMsg[1])
+        print("PID is : ", PID)
         Board, Title, Content = Get_BTC(CMD = CMD)
         cnt = TitleContent[1].split("<br>")
         for iter_cnt in cnt:
