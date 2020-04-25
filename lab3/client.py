@@ -1,5 +1,7 @@
 import socket
 import os
+import boto3
+import time
 
 
 
@@ -7,8 +9,7 @@ POS = "POS"
 NEG = "NEG"
 board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-
-
+s3 = boto3.resource("s3")
 
 def MKDIR():
     Fdata = "./.data"
@@ -58,7 +59,7 @@ def INT_handling(int_msg):
     elif int_msg.startswith("DATA"):
         int_msg = int_msg.replace("DATA ", "", 1)
         response  = 5
-    print(int_msg, "fuck")
+    print(int_msg)
     return response
 
     
@@ -74,17 +75,21 @@ def CmdLine():
     return cmd
 
 
+
+def CBucketName():
+    ti = str(time.time())
+    BucketName = "NetProLab3qsefthuk" + ti
+    return BucketName
+
+
 def REG(CMD):
     get = RECEIVE()
     response = INT_handling(int_msg = get)
     if response == 1:
-    	gogo_S3 = 1
-    	## S3
-
-
-        ## S3 done
+        BucketName = CBucketName()
+        s3.create_bucket(Bucket = BucketName)
     else:
-    	gogo_S3 = 0
+        pass
 
 
 
@@ -110,26 +115,32 @@ def LOGOUT(CMD):
     get = RECEIVE()
     response = INT_handling(int_msg = get)
 
+
 def CBOARD(CMD):
     get = RECEIVE()
     response = INT_handling(int_msg = get)
-    if response == 3:
-        gogo_S3 = 1
-    	## S3
-
-
-        ## S3 done
-        if True:
-    	    SEND(CMD = POS)
-        get1 = RECEIVE()
-        response1 = INT_handling(int_msg = get1)
-
 
 
 def LBOARD(CMD):
     print(board_Col_name)
     get = RECEIVE()
     response = INT_handling(int_msg = get)
+
+
+def CPOST(CMD):
+    get = RECEIVE()
+    response = INT_handling(int_msg = get)
+    if response == 3:
+        gogo_S3 = 1
+        ## S3
+
+
+        ## S3 done
+        if True:
+            SEND(CMD = POS)
+        get1 = RECEIVE()
+        response1 = INT_handling(int_msg = get1)
+
 
 
 

@@ -77,7 +77,7 @@ def Client_Work(ClientSocket, addr):
                 else:
                     print("Username is already used")
                     msg_output = "ERR " + "Username is already used."
-                ClientSocket.send(msg_output.encode('utf-8'))
+                SEND(CMD = msg_output)
         ## login
         if msg_input.startswith("login "):
             if len(msg_split) == 3:
@@ -90,7 +90,7 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "SUC " + "Welcome, " + cursor[1]
                 else:   # no such person or password is incorrect
                     msg_output = "ERR " + "Login failed."
-                ClientSocket.send(msg_output.encode('utf-8'))
+                SEND(CMD = msg_output)
         ## whoami
         if msg_input == "whoami":
             if login > -1:
@@ -110,13 +110,13 @@ def Client_Work(ClientSocket, addr):
                 msg_output = "SUC " + "Bye, " + cursor[1]
             else:
                 msg_output = "ERR " + "Please login first."
-            ClientSocket.send(msg_output.encode('utf-8'))
+            SEND(CMD = msg_output)
         ## exit
         if msg_input == "exit":
             print("the client ", login," want to bye")
             ClientSocket.close()
             break
-# -------------^ client done
+
         ## create-board
         if msg_input.startswith("create-board "):
             if len(msg_split) > 1:
@@ -135,7 +135,7 @@ def Client_Work(ClientSocket, addr):
                     else:
                         print("Board is already exist")
                         msg_output = "ERR " + "Board is already exist."
-                ClientSocket.send(msg_output.encode('utf-8'))
+                SEND(CMD = msg_output)
 
 
 
@@ -168,7 +168,8 @@ def Client_Work(ClientSocket, addr):
                         msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
-# -------------~ client done
+# -------------^ client done
+
         ## create the post & file of comment
         if msg_input.startswith("create-post "):         
             if len(msg_split) > 5 and TITLE in msg_input and CONTENT in msg_input:                                        
@@ -200,7 +201,6 @@ def Client_Work(ClientSocket, addr):
                         else:
                             msg_output = "ERR " + "FAILD."
                 ClientSocket.send(msg_output.encode('utf-8'))
-# -------------^ client done
 
 
         ## list the post with ## or not
