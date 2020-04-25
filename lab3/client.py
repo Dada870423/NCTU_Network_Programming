@@ -55,19 +55,17 @@ def INT_handling(int_msg):
     	int_msg = int_msg.replace("USAGE ", "", 1)
     	response = 2
     elif int_msg.startswith("POS"):
-    	return 3
+    	return 3, int_msg
     elif int_msg.startswith("NEG"):
-    	return 4
+    	return 4, int_msg
     elif int_msg.startswith("DATA"):
         int_msg = int_msg.replace("DATA ", "", 1)
         response  = 5
     elif int_msg.startswith("LOGIN"):
         int_msg = int_msg.replace("LOGIN ", "", 1)
-        LoginHandling(BWN = int_msg)
-        print("end")
-        return 6
+        return 6, int_msg
     print(int_msg)
-    return response
+    return response, int_msg
 
     
 
@@ -91,11 +89,11 @@ def CBucketName():
 
 def REG(CMD):
     get = RECEIVE()
-    response = INT_handling(int_msg = get)
+    response, trash = INT_handling(int_msg = get)
     if response == 3:
-        bucket_name = CBucketName()
-        s3.create_bucket(Bucket = bucket_name)
-        SEND(CMD = bucket_name)
+        BucketName = CBucketName()
+        s3.create_bucket(Bucket = BucketName)
+        SEND(CMD = BucketName)
     else:
         pass
     get = RECEIVE()
@@ -105,54 +103,66 @@ def REG(CMD):
 
 def LOGIN(CMD):
     get = RECEIVE()	
-    response = INT_handling(int_msg = get)
-    ## checking in INT
-    ## handling in LoginHandling
+    response, BWN = INT_handling(int_msg = get)
+    LoginHandling(BWN = BWN)
 
 def LoginHandling(BWN):
-    BN_WEL = BWN.split("##") 
-    print(BN_WEL[1])
-    target_bucket = s3.Bucket(BN_WEL[0])
-    print(fuck, BN_WEL[0])
-    return BN_WEL[0]
+    BN_WEL = BWN.split("# #") 
+    BucketName = BN_WEL[0]
+    WelcomeName = BN_WEL[1]
+    print(WelcomeName)
+    target_bucket = s3.Bucket(BucketName)
+    return BucketName
 
 
 
 def WHOAMI(CMD):
     get = RECEIVE()
-    response = INT_handling(int_msg = get)
+    INT_handling(int_msg = get)
 
 
 def LOGOUT(CMD):
     get = RECEIVE()
-    response = INT_handling(int_msg = get)
+    INT_handling(int_msg = get)
     target_bucket = None
 
 
 def CBOARD(CMD):
     get = RECEIVE()
-    response = INT_handling(int_msg = get)
+    INT_handling(int_msg = get)
 
 
 def LBOARD(CMD):
     print(board_Col_name)
     get = RECEIVE()
-    response = INT_handling(int_msg = get)
+    INT_handling(int_msg = get)
+
+
+def Get_BTC(CMD):
+    BoardTitle = CMD.split(" --title ")                   
+    TitleContent = BoardTitle[1].split(" --content ")
+    Board = BoardTitle[0]
+    Title = TitleContent[0]
+    Content = TitleContent[1]
+    return Board, Title, Content
 
 
 def CPOST(CMD):
     get = RECEIVE()
-    response = INT_handling(int_msg = get)
+    response, PID = INT_handling(int_msg = get)
     if response == 3:
-        gogo_S3 = 1
+        Board, Title, Content = Get_BTC(CMD = CMD)
+        cnt = TitleContent[1].split("<br>")
+        print(respond)
+        # os.system("echo "" >> data/comment/{}".format(P_num+1))
         ## S3
 
 
         ## S3 done
-        if True:
-            SEND(CMD = POS)
+
+        SEND(CMD = POS)
         get1 = RECEIVE()
-        response1 = INT_handling(int_msg = get1)
+        INT_handling(int_msg = get1)
 
 
 
@@ -191,7 +201,9 @@ while True:
     elif cmd.startswith("create-board"):
         CBOARD(CMD = cmd)
     elif cmd.startswith("list-board"):
-        LBOARD(CMD = cmd)    
+        LBOARD(CMD = cmd)
+    elif cmd.startswith("create-post"):
+        CPOST(CMD = cmd) 
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)
