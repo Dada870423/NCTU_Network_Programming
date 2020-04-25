@@ -158,7 +158,7 @@ def CPOST(CMD):
     PID = PidSMsg[0]
     print(PidSMsg[1])
     print("PID is : ", PID)
-    if response == 3:
+    if response == 6:
         Board, Title, Content = Get_BTC(CMD = CMD)
         cnt = TitleContent[1].split("<br>")
         for iter_cnt in cnt:
