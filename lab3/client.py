@@ -114,6 +114,7 @@ def LoginHandling(BWN):
     BucketName = BN_WEL[0]
     WelcomeName = BN_WEL[1]
     print(WelcomeName)
+    global target_bucket
     target_bucket = s3.Bucket(BucketName)
     return BucketName
 
@@ -161,7 +162,7 @@ def CPOST(CMD):
         print(PidSMsg[1])
         print("PID is : ", PID)
         Board, Title, Content = Get_BTC(CMD = CMD)
-        cnt = TitleContent[1].split("<br>")
+        cnt = Content.split("<br>")
         for iter_cnt in cnt:
             print(iter_cnt)
             os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
