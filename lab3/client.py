@@ -8,8 +8,8 @@ import time
 POS = "POS"
 NEG = "NEG"
 target_bucket = None
-board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
+board_Col_name = "{:^7} {:^20} {:^20} \r\n".format("Index", "Name", "Moderator")
+post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n".format("ID", "Title", "Author", "Date")
 
 s3 = boto3.resource('s3')
 
@@ -152,7 +152,8 @@ def Get_BTC(CMD):
 def CPOST(CMD):
     get = RECEIVE()
     response, PID = INT_handling(int_msg = get)
-    if response == 3:
+    print(PID)
+    if response == 300000:
         Board, Title, Content = Get_BTC(CMD = CMD)
         cnt = TitleContent[1].split("<br>")
         print(respond)

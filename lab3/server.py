@@ -159,7 +159,7 @@ def Client_Work(ClientSocket, addr):
                 else:
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
             elif hashtag in HBName: ## with keyword
@@ -172,7 +172,7 @@ def Client_Work(ClientSocket, addr):
                 else:
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
 # -------------^ client done
@@ -199,7 +199,11 @@ def Client_Work(ClientSocket, addr):
                         SEND(CMD = msg_output)
                     else:
                         print("Board exist")
-                        msg_output = POS + "3" ## PID ## 
+
+                        Last_post = c.execute('SELECT * FROM POSTS WHERE TITLE = ?', (TitleContent[0],)).fetchall()
+                        PID = str(Last_post[-1][0])
+
+                        msg_output = POS + PID ## PID ## 
                         SEND(CMD = msg_output)
                         CBRES = RECEIVE()
                         if CBRES.startswith("POS"):
@@ -253,8 +257,6 @@ def Client_Work(ClientSocket, addr):
                 else:
                     print("Board is exist")
                     cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )).fetchone()
-                    # msg_output = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
-                    # ClientSocket.send(msg_output.encode('utf-8'))
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
                         msg_output = "int80 " + post_Col_name
@@ -356,50 +358,41 @@ def Client_Work(ClientSocket, addr):
 
         ## Command not found
         if msg_input.startswith("register"):
-            msg_Usage = "Usage: register <username> <email> <password>\r\n"
+            msg_Usage = "Usage: register <username> <email> <password>"
         elif msg_input.startswith("login"):
-            msg_Usage = "Usage: login <username> <password>\r\n"
+            msg_Usage = "Usage: login <username> <password>"
         elif msg_input.startswith("whoami"):
-            msg_Usage = "Usage: whoami\r\n"
+            msg_Usage = "Usage: whoami"
         elif msg_input.startswith("logout"):
-            msg_Usage = "Usage: logout\r\n"
+            msg_Usage = "Usage: logout"
         elif msg_input.startswith("exit"):
-            msg_Usage = "Usage: exit\r\n"
+            msg_Usage = "Usage: exit"
         elif msg_input.startswith("create-board"):
-            msg_Usage = "Usage: create-board <borad-name>\r\n"
+            msg_Usage = "Usage: create-board <borad-name>"
         elif msg_input.startswith("list-board"):
             if hashtag in msg_input:
-                msg_Usage = "Usage: list-board ##<key>\r\n"
+                msg_Usage = "Usage: list-board ##<key>"
             else:
-                msg_Usage = "Usage: list-board\r\n"
+                msg_Usage = "Usage: list-board"
         elif msg_input.startswith("create-post"):
-            msg_Usage = "Usage: create-post <board-name> --title <title> --content <content>\r\n"
+            msg_Usage = "Usage: create-post <board-name> --title <title> --content <content>"
         elif msg_input.startswith("list-post"):
             if hashtag in msg_input:
-                msg_Usage = "Usage: list-post <board-name> ##<key>\r\n"
+                msg_Usage = "Usage: list-post <board-name> ##<key>"
             else:
-                msg_Usage = "Usage: list-post <board-name>\r\n"
+                msg_Usage = "Usage: list-post <board-name>"
         elif msg_input.startswith("read"):
-            msg_Usage = "Usage: read <post-id>\r\n"
+            msg_Usage = "Usage: read <post-id>"
         elif msg_input.startswith("delete-post"):
-            msg_Usage = "Usage: delete-post <post-id>\r\n"
+            msg_Usage = "Usage: delete-post <post-id>"
         elif msg_input.startswith("update-post"):
             msg_Usage = "Usage: update-post <post-id> --title/content <new>\r\n"        
         elif msg_input.startswith("comment"):
-            msg_Usage = "Usage: comment <post-id> <comment>\r\n" 
+            msg_Usage = "Usage: comment <post-id> <comment>" 
         else:
-            msg_Usage = "Command not found\r\n"
+            msg_Usage = "Command not found"
 
-        ## output to client
-#        if msg_suc != "":
-#            msg_suc = "SUC " + msg_suc
-#            ClientSocket.send(msg_suc.encode('utf-8'))
-#            msg_suc = ""
-#        elif msg_err != "":
-#            msg_err = "ERR " + msg_err
-#            ClientSocket.send(msg_err.encode('utf-8'))
-#            msg_err = ""
-#        else:
+
         if msg_output == "":
             msg_Usage = "USAGE " + msg_Usage
             ClientSocket.send(msg_Usage.encode('utf-8'))
