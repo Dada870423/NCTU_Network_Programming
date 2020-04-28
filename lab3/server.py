@@ -396,9 +396,8 @@ def Client_Work(ClientSocket, addr):
 
 
         ## list the mail
-        if msg_input.startswith("list-mail "): 
+        if msg_input == "list-mail": 
             print("Want to list ", login, " s mail")
-            cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
             if login == -1:
                 msg_output = "ERR " + "Please login first."
                 SEND(CMD = msg_output)
