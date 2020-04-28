@@ -17,11 +17,12 @@ def MKDIR():
     Pdata = "./.data"
     Ppost = "./.data/post"
     Pcomment = "./.data/comment"
-
+    Pmail = "./.data/mail"
     try:
       os.makedirs(Pdata)
       os.makedirs(Ppost)
       os.makedirs(Pcomment)
+      os.makedirs(Pmail)
     except FileExistsError:
       return
 
@@ -239,10 +240,27 @@ def UPDATE(CMD):
 
 
 
+def MailTo(CMD):
+    get = RECEIVE()
+    response, MidRbucket = INT_handling(int_msg = get)
+    if response == 6:
+        MidRbucket = MidRbucket.split("# #")
+        MID = MidRbucket[0]
+        RBucket = MidRbucket[1]
+
+        TRASHCnt = CMD.split(" --content ")
+        cnt = TRASHCnt[1]
+
+        for iter_cnt in cnt:
+            print(iter_cnt)
+            os.system("echo {} >> ./.data/mail/M{}".format(iter_cnt, MID))
+        MailTarget_Bucket = s3.Bucket(RBucket)
+        MailTarget_Bucket.upload_file("./.data/mail/M{}".format(MID), "M{}".format(MID))
+
+        print(MidRbucket[2])
 
 
-
-HOST = '3.84.34.171'
+HOST = '3.92.193.75'
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -285,6 +303,8 @@ while True:
         COMMENT(CMD = cmd)
     elif cmd.startswith("update-post"):
         UPDATE(CMD = cmd)
+    elif cmd.startswith("mail-to"):
+        MailTo(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)

@@ -49,6 +49,7 @@ def Client_Work(ClientSocket, addr):
     msg_output = ""
     hashtag = "##"
     TITLE = " --title "
+    SUBJECT = " --subject "
     CONTENT = " --content "
     POS = "POS"
     NEG = "NEG"
@@ -73,7 +74,7 @@ def Client_Work(ClientSocket, addr):
                     SEND(CMD = POS)
                     BucketName = RECEIVE()
 
-                    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password", "BucketName") VALUES (?, ?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3], BucketName))
+                    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password", "BucketName", "Mnum") VALUES (?, ?, ?, ?, 0)', (msg_split[1], msg_split[2], msg_split[3], BucketName))
                     conn.commit()
                     print("USER insertion is success")
                     msg_output = "SUC " + "Register successfully."
@@ -348,6 +349,60 @@ def Client_Work(ClientSocket, addr):
                     print(cursor[1])
                     msg_output = "TROBLE " + cursor[1] + "# #" + Cname + "# #" + "Comment successfully.\r\n"
                     SEND(CMD = msg_output)
+
+
+
+        ## mail to
+        if msg_input.startswith("mail-to "):         
+            if len(msg_split) > 5 and SUBJECT in msg_input and CONTENT in msg_input:                                        
+                no_mt = msg_input.replace("mail-to ", "", 1)
+                if login == -1:
+                    msg_output = "ERR " + "Please login first."
+                    SEND(CMD = msg_output)
+                elif msg_split[1] == "subject":
+                    print("He did not choose the receiver")
+                elif msg_split[3] == "--content":
+                    print("He did not name the title")
+                else:
+                    UNameSub = no_mt.split(" --subject ")
+                    Receiver = UNameSub[0] ## receiver 
+                    SubContent = UNameSub[1].split(" --content ")
+                    Subject = SubContent[0]
+
+                    print("Receiver is : ", Receiver, " Subject is : ", Subject, "Content is : ", SubContent[1])
+                    cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (Receiver,)).fetchone()
+                    if cursor == None: #Receiver is not exist
+                        print("Receiver is not exist")
+                        msg_output = "ERR " + Receiver + "does not exist."
+                        SEND(CMD = msg_output)
+                    else:
+                        print("Receiver exist")
+                        Rid = cursor[0]
+                        RBucket = cursor[4]
+                        Mnum = cursor[5] + 1
+                        ## get receiver info
+                        NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
+                        
+                        cursor = c.execute('INSERT INTO MAILS ("Subject", "DT", "Sender", "Receiver", "Mnum") VALUES (?, ?, ?, ?, ?)', (Subject, NowTime, login, Rid, Mnum))
+                        cursor = c.execute('UPDATE USERS SET Mnum = ? WHERE UID = ?', (Mnum, Rid))
+                        conn.commit()
+                        ## get MID to create M{}
+                        Last_mail = c.execute('SELECT * FROM MAILS WHERE Sender = ?', (login,)).fetchall()
+                        MID = str(Last_mail[-1][0])
+                        print(NowTime, "Sent successfully.")
+                        msg_output = "TROBLE " + MID + "# #" + RBucket + "# #" + "Sent successfully."
+                        SEND(CMD = msg_output)
+
+
+
+
+
+
+
+
+
+
+
 
 
         ## Command not found
