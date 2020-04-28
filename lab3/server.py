@@ -404,14 +404,28 @@ def Client_Work(ClientSocket, addr):
             else:
                 print("list")
                 msg_output = "DATA "
-                for row in c.execute("SELECT * FROM MAILS WHERE MAIL.Receiver=?", (login, )):
+                for row in c.execute("SELECT * FROM MAILS WHERE MAILS.Receiver=?", (login, )):
                     print("{:>5} {:^20} {:^20} {:^9}".format(row[5], row[1], row[2], row[3]))
                     msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
                 SEND(CMD = msg_output)
 
 
 
-
+        ## delete the mail
+        if len(msg_split) == 2 and msg_split[0] == "delete-mail":
+            if login == -1:
+                msg_output = "ERR " + "Please login first."
+            else:
+                cursor = c.execute('SELECT * FROM MAILS WHERE Receiver = ? and Mnum = ?', (login, msg_split[1])).fetchone()
+                if cursor == None:
+                    print(cursor, "No such mail.")
+                    msg_output = "ERR " + "No such mail."
+                else:
+                    cursor = c.execute('DELETE FROM MAILS WHERE MID = ?', (cursor[0],))
+                    conn.commit()
+                    print("POST delete is success")
+                    msg_output = "SUC " + "Delete successfully."
+            SEND(CMD = msg_output)
 
 
 
