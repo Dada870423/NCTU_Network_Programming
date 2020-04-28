@@ -395,7 +395,20 @@ def Client_Work(ClientSocket, addr):
 
 
 
-
+        ## list the mail
+        if msg_input.startswith("list-post "): 
+            print("Want to list ", login, " s mail")
+            cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
+            if login == -1:
+                msg_output = "ERR " + "Please login first."
+                SEND(CMD = msg_output)
+            else:
+                print("list")
+                msg_output = "DATA "
+                for row in c.execute("SELECT * FROM MAILS WHERE MIAL.Receiver=?", (login, )):
+                    print("{:>5} {:^20} {:^20} {:^9}".format(row[5], row[1], row[2], row[3]))
+                    msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[0], row[1], row[2], row[3])
+                SEND(CMD = msg_output)
 
 
 

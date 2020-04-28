@@ -10,6 +10,8 @@ NEG = "NEG"
 target_bucket = None
 board_Col_name = "{:^7} {:^20} {:^20} \r\n".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n".format("ID", "Title", "Author", "Date")
+mail_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n".format("ID", "Subject", "From", "Date")
+
 
 s3 = boto3.resource('s3')
 
@@ -249,8 +251,8 @@ def MailTo(CMD):
         RBucket = MidRbucket[1]
 
         TRASHCnt = CMD.split(" --content ")
-        cnt = TRASHCnt[1]
-
+        Content = TRASHCnt[1]
+        cnt = Content.split("<br>")
         for iter_cnt in cnt:
             print(iter_cnt)
             os.system("echo {} >> ./.data/mail/M{}".format(iter_cnt, MID))
@@ -260,7 +262,17 @@ def MailTo(CMD):
         print(MidRbucket[2])
 
 
-HOST = '3.92.193.75'
+def LMAIL(CMD):
+    get = RECEIVE()
+    if get.startswith("DATA") or get.startswith("NEG"):
+        print(post_Col_name)
+    INT_handling(int_msg = get)
+
+
+
+
+
+HOST = "3.92.193.75"
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -305,6 +317,8 @@ while True:
         UPDATE(CMD = cmd)
     elif cmd.startswith("mail-to"):
         MailTo(CMD = cmd)
+    elif cmd.startswith("list-mail"):
+        LPOST(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)
