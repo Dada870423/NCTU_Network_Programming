@@ -396,7 +396,7 @@ def Client_Work(ClientSocket, addr):
 
 
         ## list the mail
-        if msg_input.startswith("list-post "): 
+        if msg_input.startswith("list-mail "): 
             print("Want to list ", login, " s mail")
             cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
             if login == -1:
