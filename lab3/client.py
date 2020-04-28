@@ -250,8 +250,12 @@ def MailTo(CMD):
         MID = MidRbucket[0]
         RBucket = MidRbucket[1]
 
-        TRASHCnt = CMD.split(" --content ")
-        Content = TRASHCnt[1]
+        UNameSub = CMD.split(" --subject ")
+        SubContent = UNameSub[1].split(" --content ")
+        Subject = SubContent[0]
+        
+
+        Content = SubContent[1]
         cnt = Content.split("<br>")
         for iter_cnt in cnt:
             print(iter_cnt)
@@ -265,7 +269,7 @@ def MailTo(CMD):
 def LMAIL(CMD):
     get = RECEIVE()
     if get.startswith("DATA") or get.startswith("NEG"):
-        print(post_Col_name)
+        print(mail_Col_name)
     INT_handling(int_msg = get)
 
 
