@@ -373,7 +373,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (Receiver,)).fetchone()
                     if cursor == None: #Receiver is not exist
                         print("Receiver is not exist")
-                        msg_output = "ERR " + Receiver + "does not exist."
+                        msg_output = "ERR " + Receiver + "  does not exist."
                         SEND(CMD = msg_output)
                     else:
                         print("Receiver exist")
@@ -404,9 +404,11 @@ def Client_Work(ClientSocket, addr):
             else:
                 print("list")
                 msg_output = "DATA "
-                for row in c.execute("SELECT * FROM MAILS WHERE MAILS.Receiver=?", (login, )):
-                    print("{:>5} {:^20} {:^20} {:^9}".format(row[5], row[1], row[2], row[3]))
-                    msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(row[5], row[1], row[2], row[3])
+                iter_mail = 0
+                for row in c.execute("SELECT MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Receiver=USERS.UID WHERE MAILS.Receiver = ? and MAILS.Mnum = ?", (login, )).fetchone():
+                    iter_mail = iter_mail + 1
+                    print("{:>5} {:^20} {:^20} {:^9}".format(iter_mail, row[0], row[1], row[2]))
+                    msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(iter_mail, row[0], row[1], row[2])
                 SEND(CMD = msg_output)
 
 
@@ -416,12 +418,13 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_output = "ERR " + "Please login first."
             else:
-                cursor = c.execute('SELECT * FROM MAILS WHERE Receiver = ? and Mnum = ?', (login, msg_split[1])).fetchone()
+                cursor = c.execute("SELECT * FROM MAILS WHERE Receiver = ?", (login, ))..fetchall()
                 if cursor == None:
                     print(cursor, "No such mail.")
                     msg_output = "ERR " + "No such mail."
                 else:
-                    cursor = c.execute('DELETE FROM MAILS WHERE MID = ?', (cursor[0],))
+                    MID = cursor[int(msg_split[1]) - 1][0]
+                    cursor = c.execute('DELETE FROM MAILS WHERE MID = ?', (MID,))
                     conn.commit()
                     print("POST delete is success")
                     msg_output = "SUC " + "Delete successfully."

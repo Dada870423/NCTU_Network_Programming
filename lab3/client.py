@@ -337,7 +337,7 @@ while True:
     elif cmd.startswith("mail-to"):
         MailTo(CMD = cmd)
     elif cmd == "list-mail":
-        LPOST(CMD = cmd)
+        LMAIL(CMD = cmd)
     elif cmd.startswith("retr-mail"):
         RPOST(CMD = cmd)
     else:
