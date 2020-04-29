@@ -131,6 +131,7 @@ def WHOAMI(CMD):
 def LOGOUT(CMD):
     get = RECEIVE()
     INT_handling(int_msg = get)
+    global target_bucket
     target_bucket = None
 
 
@@ -274,6 +275,20 @@ def LMAIL(CMD):
 
 
 
+def RPOST(CMD):
+    get = RECEIVE()
+    response, MidMsg = INT_handling(int_msg = get)
+    if response == 6:
+        MidMsg = MidMsg.split("# #")
+        Mid = MidMsg[0]
+        Msg = MidMsg[1]
+        print(Msg)
+        target_object = target_bucket.Object("M{}".format(Mid)) 
+        object_content = target_object.get()["Body"].read().decode()
+        print(object_content)
+
+
+
 
 
 HOST = "3.92.193.75"
@@ -321,8 +336,10 @@ while True:
         UPDATE(CMD = cmd)
     elif cmd.startswith("mail-to"):
         MailTo(CMD = cmd)
-    elif cmd.startswith("list-mail"):
+    elif cmd == "list-mail":
         LPOST(CMD = cmd)
+    elif cmd.startswith("retr-mail"):
+        RPOST(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)

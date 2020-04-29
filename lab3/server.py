@@ -427,7 +427,20 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "SUC " + "Delete successfully."
             SEND(CMD = msg_output)
 
+        ## retr mail
+        if len(msg_split) == 2 and msg_split[0] == "retr-mail":
+            if login == -1:
+                msg_output = "ERR " + "Please login first."
+            else:
+                cursor = c.execute('SELECT * FROM MAILS WHERE Receiver = ? and Mnum = ?', (login, msg_split[1])).fetchone()
 
+                if cursor == None:
+                    print(cursor, "No such mail.")
+                    msg_output = "ERR " + "No such mail."
+                else:
+                    print(cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5]) ##cursor[0] is MID
+                    msg_output = "TROBLE " + cursor[0] + "# #" + "Subject   : {:>20} \r\nFROM      : {:>20} \r\nDate      : {:>20}\r\n--\r\n".format(cursor[1], cursor[3], cursor[2])
+                SEND(CMD = msg_output)
 
 
 
