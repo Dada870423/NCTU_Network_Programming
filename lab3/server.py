@@ -370,7 +370,7 @@ def Client_Work(ClientSocket, addr):
                     Subject = SubContent[0]
 
                     print("Receiver is : ", Receiver, " Subject is : ", Subject, "Content is : ", SubContent[1])
-                    cursor = c.execute('SELECT * FROM USERS WHERE Username = ?', (Receiver,)).fetchone()
+                    cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (Receiver,)).fetchone()
                     if cursor == None: #Receiver is not exist
                         print("Receiver is not exist")
                         msg_output = "ERR " + Receiver + "does not exist."
