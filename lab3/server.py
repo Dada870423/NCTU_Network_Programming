@@ -418,7 +418,7 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_output = "ERR " + "Please login first."
             else:
-                cursor = c.execute("SELECT * FROM MAILS WHERE Receiver = ?", (login, ))..fetchall()
+                cursor = c.execute("SELECT * FROM MAILS WHERE Receiver = ?", (login, )).fetchall()
                 if cursor == None:
                     print(cursor, "No such mail.")
                     msg_output = "ERR " + "No such mail."
