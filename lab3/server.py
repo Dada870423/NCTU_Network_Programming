@@ -405,7 +405,7 @@ def Client_Work(ClientSocket, addr):
                 print("list")
                 msg_output = "DATA "
                 iter_mail = 0
-                for row in c.execute("SELECT MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Receiver=USERS.UID WHERE MAILS.Receiver = ? and MAILS.Mnum = ?", (login, )).fetchone():
+                for row in c.execute("SELECT MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Receiver=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchone():
                     iter_mail = iter_mail + 1
                     print("{:>5} {:^20} {:^20} {:^9}".format(iter_mail, row[0], row[1], row[2]))
                     msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(iter_mail, row[0], row[1], row[2])
