@@ -43,8 +43,6 @@ def Client_Work(ClientSocket, addr):
     
     # Initialize
     login = -1 ## check login or not and whoami
-    msg_suc = ""
-    msg_err = ""
     msg_Usage = ""
     msg_output = ""
     hashtag = "##"
@@ -53,14 +51,10 @@ def Client_Work(ClientSocket, addr):
     CONTENT = " --content "
     POS = "POS"
     NEG = "NEG"
-    board_Col_name = "{:^7} {:^20} {:^20} \r\n\r\n".format("Index", "Name", "Moderator")
-    post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n\r\n".format("ID", "Title", "Author", "Date")
     conn = sqlite3.connect('BBS.db')
     print("opened databases successfully")
     c = conn.cursor()
     while True:
-        # msg = "% "
-        # ClientSocket.send(msg.encode('utf-8'))
         msg_input = RECEIVE()
         msg_input = msg_input.replace('\n', '').replace('\r', '')
         msg_split = msg_input.split()

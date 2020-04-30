@@ -171,7 +171,6 @@ def CPOST(CMD):
         PidSMsg = PidSMsg.split("# #")
         PID = PidSMsg[0]
         print(PidSMsg[1])
-        print("PID is : ", PID)
         Board, Title, Content = Get_BTC(CMD = CMD)
         cnt = Content.split("<br>")
         for iter_cnt in cnt:
@@ -207,7 +206,6 @@ def READPOST(CMD):
 def COMMENT(CMD):
     get = RECEIVE()
     response, BucketSucMsg = INT_handling(int_msg = get)
-    print("res: ", response)
     if response == 6:
         msg_split = CMD.split(" ")
         PID = msg_split[1]
@@ -237,7 +235,6 @@ def UPDATE(CMD):
             cnt = UContent[1].split("<br>")
             os.system("rm ./.data/post/P{}".format(PID))
             for iter_cnt in cnt:
-                print(iter_cnt)
                 os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
             target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
 
@@ -259,7 +256,6 @@ def MailTo(CMD):
         Content = SubContent[1]
         cnt = Content.split("<br>")
         for iter_cnt in cnt:
-            print(iter_cnt)
             os.system("echo {} >> ./.data/mail/M{}".format(iter_cnt, MID))
         MailTarget_Bucket = s3.Bucket(RBucket)
         MailTarget_Bucket.upload_file("./.data/mail/M{}".format(MID), "M{}".format(MID))
