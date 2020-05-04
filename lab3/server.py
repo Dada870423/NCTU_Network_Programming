@@ -341,7 +341,7 @@ def Client_Work(ClientSocket, addr):
                     print("I am ", Cname, "and i want to comment", Ccomment, "in", msg_split[1])
                     cursor = c.execute("SELECT USERS.Username, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()          
                     print(cursor[1])
-                    msg_output = "TROBLE " + cursor[1] + "# #" + Cname + "# #" + "Comment successfully.\r\n"
+                    msg_output = "TROBLE " + cursor[1] + "# #" + Cname + "# #" + "Comment successfully."
                     SEND(CMD = msg_output)
 
 
@@ -471,7 +471,7 @@ def Client_Work(ClientSocket, addr):
         elif msg_input.startswith("delete-post"):
             msg_Usage = "Usage: delete-post <post-id>"
         elif msg_input.startswith("update-post"):
-            msg_Usage = "Usage: update-post <post-id> --title/content <new>\r\n"        
+            msg_Usage = "Usage: update-post <post-id> --title/content <new>"        
         elif msg_input.startswith("comment"):
             msg_Usage = "Usage: comment <post-id> <comment>" 
         else:
