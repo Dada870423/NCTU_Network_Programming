@@ -68,7 +68,7 @@ def Client_Work(ClientSocket, addr):
                     SEND(CMD = POS)
                     BucketName = RECEIVE()
 
-                    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password", "BucketName", "Mnum") VALUES (?, ?, ?, ?, 0)', (msg_split[1], msg_split[2], msg_split[3], BucketName))
+                    cursor = c.execute('INSERT INTO USERS ("Username", "Email", "Password", "BucketName") VALUES (?, ?, ?, ?)', (msg_split[1], msg_split[2], msg_split[3], BucketName))
                     conn.commit()
                     print("USER insertion is success")
                     msg_output = "SUC " + "Register successfully."
@@ -373,12 +373,12 @@ def Client_Work(ClientSocket, addr):
                         print("Receiver exist")
                         Rid = cursor[0]
                         RBucket = cursor[4]
-                        Mnum = cursor[5] + 1
+                        # Mnum = cursor[5] + 1
                         ## get receiver info
                         NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
                         
-                        cursor = c.execute('INSERT INTO MAILS ("Subject", "DT", "Sender", "Receiver", "Mnum") VALUES (?, ?, ?, ?, ?)', (Subject, NowTime, login, Rid, Mnum))
-                        cursor = c.execute('UPDATE USERS SET Mnum = ? WHERE UID = ?', (Mnum, Rid))
+                        cursor = c.execute('INSERT INTO MAILS ("Subject", "DT", "Sender", "Receiver") VALUES (?, ?, ?, ?)', (Subject, NowTime, login, Rid)) # Mnum
+                        # cursor = c.execute('UPDATE USERS SET Mnum = ? WHERE UID = ?', (Mnum, Rid))
                         conn.commit()
                         ## get MID to create M{}
                         Last_mail = c.execute('SELECT * FROM MAILS WHERE Sender = ?', (login,)).fetchall()
@@ -429,7 +429,7 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_output = "ERR " + "Please login first."
             else:
-                cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ? and MAILS.Mnum = ?", (login, msg_split[1])).fetchone() 
+                cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchone() 
 
                 if cursor == None:
                     print(cursor, "No such mail.")
