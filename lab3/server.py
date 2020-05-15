@@ -474,6 +474,14 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Usage: update-post <post-id> --title/content <new>"        
         elif msg_input.startswith("comment"):
             msg_Usage = "Usage: comment <post-id> <comment>" 
+        elif msg_input.startswith("mail-to"):
+            msg_Usage = "Usage: mail-to <username> --subject <subject> --content <content> " 
+        elif msg_input.startswith("list-mail"):
+            msg_Usage = "Usage: list-mail" 
+        elif msg_input.startswith("delete-mail"):
+            msg_Usage = "Usage: delete-mail <mail#>" 
+        elif msg_input.startswith("retr-mail"):
+            msg_Usage = "Usage: retr-mail <mail#>" 
         else:
             msg_Usage = "Command not found"
 
