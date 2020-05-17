@@ -88,7 +88,7 @@ def Client_Work(ClientSocket, addr):
                     if cursor != None and cursor[3] == msg_split[2]: #person is exist
                         print("She is ", cursor[0], cursor[1])
                         login = cursor[0]
-                        msg_output = "TROBLE " + cursor[4] + "# #" + "Welcome, " + cursor[1] 
+                        msg_output = "TROBLE " + cursor[4] + "# #" + "Welcome, " + cursor[1] + "."
                         SEND(CMD = msg_output)
                     else:   # no such person or password is incorrect
                         msg_output = "ERR " + "Login failed."
@@ -109,7 +109,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
                 login = -1
                 print("Bye from ", cursor[0], "\r\n")
-                msg_output = "SUC " + "Bye, " + cursor[1]
+                msg_output = "SUC " + "Bye, " + cursor[1] + "."
             else:
                 msg_output = "ERR " + "Please login first."
             SEND(CMD = msg_output)
@@ -192,7 +192,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BoardTitle[0],)).fetchone()
                     if cursor == None: #Board is not exist
                         print("Board is not exist")
-                        msg_output = "ERR " + "Board is not exist."
+                        msg_output = "ERR " + "Board does not exist."
                         SEND(CMD = msg_output)
                     else:
                         print("Board exist")
@@ -224,7 +224,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                     if cursor == None:                        ## Board is not exist
                         print("Board is not exist")
-                        msg_output = "ERR " + "Board is not exist."
+                        msg_output = "ERR " + "Board does not exist."
                         SEND(CMD = msg_output)
                     else:
                         print("Board is exist")
@@ -244,7 +244,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM BOARDS WHERE BName = ?', (BName,)).fetchone()
                 if cursor == None:                        ## Board is not exist
                     print("Board is not exist")
-                    msg_output = "ERR " + "Board is not exist."
+                    msg_output = "ERR " + "Board does not exist."
                     SEND(CMD = msg_output)
                 else:
                     print("Board is exist")
@@ -266,7 +266,7 @@ def Client_Work(ClientSocket, addr):
             cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
             if cursor == None:
                 print(cursor, "Post is not exist.")
-                msg_output = "ERR " + "Post is not exist."
+                msg_output = "ERR " + "Post does not exist."
                 SEND(CMD = msg_output)
             else:
                 cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
@@ -283,7 +283,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
                 if cursor == None:
                     print(cursor, "Post is not exist.")
-                    msg_output = "ERR " + "Post is not exist."
+                    msg_output = "ERR " + "Post does not exist."
                 elif cursor[3] != login:
                     print("Owner is:",  cursor[3])
                     msg_output = "ERR " + "Not the post owner."
@@ -313,18 +313,18 @@ def Client_Work(ClientSocket, addr):
                     print("I want to update the title, and the new title is:", UTitle[1])	
                     cursor = c.execute('UPDATE POSTS SET TITLE = ? WHERE PID = ?', (UTitle[1], msg_split[1]))
                     conn.commit()
-                    msg_output = "SUC " + "Update successfully.\r\n"
+                    msg_output = "SUC " + "Update successfully."
                     SEND(CMD = msg_output)
                 elif msg_split[2] == "--content":
                     UContent = msg_input.split(" --content ") 
                     print("I want to update the content, and the new content is:", UContent[1])
 
-                    msg_output = "SUC " + "Update successfully.\r\n"
+                    msg_output = "SUC " + "Update successfully."
                     SEND(CMD = msg_output)
         ## comment
         if msg_input.startswith("comment ") and len(msg_split) > 2:
             if login == -1:
-                msg_output = "ERR " + "Please login first.\r\n"
+                msg_output = "ERR " + "Please login first."
                 SEND(CMD = msg_output)
             else:
                 cursor = c.execute('SELECT * FROM POSTS WHERE PID = ?', (msg_split[1],)).fetchone()
@@ -475,7 +475,7 @@ def Client_Work(ClientSocket, addr):
         elif msg_input.startswith("comment"):
             msg_Usage = "Usage: comment <post-id> <comment>" 
         elif msg_input.startswith("mail-to"):
-            msg_Usage = "Usage: mail-to <username> --subject <subject> --content <content> " 
+            msg_Usage = "Usage: mail-to <username> --subject <subject> --content <content>" 
         elif msg_input.startswith("list-mail"):
             msg_Usage = "Usage: list-mail" 
         elif msg_input.startswith("delete-mail"):
