@@ -200,7 +200,7 @@ def Client_Work(ClientSocket, addr):
 
                         NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
                         nowtime_year =  time.strftime('%Y-%m-%d', time.localtime())
-                        cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT") VALUES (?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime))
+                        cursor = c.execute('INSERT INTO POSTS ("TITLE", "BName", "UID", "DT", "DTY") VALUES (?, ?, ?, ?, ?)', (TitleContent[0], BoardTitle[0], login, NowTime, nowtime_year))
                         conn.commit()
                         Last_post = c.execute('SELECT * FROM POSTS WHERE TITLE = ?', (TitleContent[0],)).fetchall()
                         PID = str(Last_post[-1][0])
@@ -271,7 +271,7 @@ def Client_Work(ClientSocket, addr):
                 msg_output = "ERR " + "Post does not exist."
                 SEND(CMD = msg_output)
             else:
-                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DT, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
+                cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DTY, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
                 print(cursor[0], cursor[1], cursor[2], cursor[3]) ##cursor[3] is BucketName
                 msg_output = "TROBLE " + cursor[3] + "# #" + "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
                 SEND(CMD = msg_output)
@@ -378,8 +378,8 @@ def Client_Work(ClientSocket, addr):
                         # Mnum = cursor[5] + 1
                         ## get receiver info
                         NowTime = time.strftime("%m/%d", time.localtime()) ## is a string
-                        
-                        cursor = c.execute('INSERT INTO MAILS ("Subject", "DT", "Sender", "Receiver") VALUES (?, ?, ?, ?)', (Subject, NowTime, login, Rid)) # Mnum
+                        nowtime_year =  time.strftime('%Y-%m-%d', time.localtime())
+                        cursor = c.execute('INSERT INTO MAILS ("Subject", "DT", "Sender", "Receiver", "DTY") VALUES (?, ?, ?, ?, ?)', (Subject, NowTime, login, Rid, nowtime_year)) # Mnum
                         # cursor = c.execute('UPDATE USERS SET Mnum = ? WHERE UID = ?', (Mnum, Rid))
                         conn.commit()
                         ## get MID to create M{}
@@ -431,7 +431,7 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_output = "ERR " + "Please login first."
             else:
-                cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchone() 
+                cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DTY FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchone() 
 
                 if cursor == None:
                     print(cursor, "No such mail.")
