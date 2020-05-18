@@ -404,7 +404,7 @@ def Client_Work(ClientSocket, addr):
                 for row in c.execute("SELECT MAILS.Subject, USERS.Username, MAILS.DT FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )):
                     iter_mail = iter_mail + 1
                     print("{:>5} {:^20} {:^20} {:^9}".format(iter_mail, row[0], row[1], row[2]))
-                    msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n\r\n".format(iter_mail, row[0], row[1], row[2])
+                    msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n".format(iter_mail, row[0], row[1], row[2])
                 SEND(CMD = msg_output)
 
 
@@ -423,7 +423,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute('DELETE FROM MAILS WHERE MID = ?', (MID,))
                     conn.commit()
                     print("POST delete is success")
-                    msg_output = "SUC " + "Delete successfully."
+                    msg_output = "SUC " + "Mail deleted."
             SEND(CMD = msg_output)
 
         ## retr mail
@@ -431,7 +431,7 @@ def Client_Work(ClientSocket, addr):
             if login == -1:
                 msg_output = "ERR " + "Please login first."
             else:
-                cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DTY FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchone() 
+                cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DTY FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchall() 
 
                 if len(cursor) < int(msg_split[1]):
                     print(cursor, "No such mail.")

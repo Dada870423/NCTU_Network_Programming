@@ -10,7 +10,7 @@ NEG = "NEG"
 target_bucket = None
 board_Col_name = "{:^7} {:^20} {:^20} \r\n".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n".format("ID", "Title", "Author", "Date")
-mail_Col_name = "{:^7} {:^20} {:^20} {:^9}\r\n".format("ID", "Subject", "From", "Date")
+mail_Col_name = "{:^7} {:^20} {:^20} {:^9}".format("ID", "Subject", "From", "Date")
 
 
 s3 = boto3.resource('s3')
