@@ -432,13 +432,13 @@ def Client_Work(ClientSocket, addr):
                 msg_output = "ERR " + "Please login first."
             else:
                 cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DTY FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchall() 
-
-                if len(cursor) < int(msg_split[1]):
+                Mid = int(msg_split[1])
+                if len(cursor) < Mid:
                     print(cursor, "No such mail.")
                     msg_output = "ERR " + "No such mail."
                 else:
-                    print(cursor[0], cursor[1], cursor[2], cursor[3]) ##cursor[0] is MID
-                    msg_output = "TROBLE " + str(cursor[0]) + "# #" + "Subject   : {:>20} \r\nFROM      : {:>20} \r\nDate      : {:>20}\r\n--".format(cursor[1], cursor[2], cursor[3])
+                    print(cursor[Mid][0], cursor[Mid][1], cursor[Mid][2], cursor[Mid][3]) ##cursor[0] is MID
+                    msg_output = "TROBLE " + str(cursor[Mid][0]) + "# #" + "Subject   : {:>20} \r\nFROM      : {:>20} \r\nDate      : {:>20}\r\n--".format(cursor[Mid][1], cursor[Mid][2], cursor[Mid][3])
             SEND(CMD = msg_output)
 
 
