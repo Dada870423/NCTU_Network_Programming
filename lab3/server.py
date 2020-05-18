@@ -30,7 +30,7 @@ def Client_Work(ClientSocket, addr):
 
     ## print welcome msg
     msg = ""
-    msg = "********************************\r\n** Welcome to the BBS server. **\r\n********************************\r\n" 
+    msg = "********************************\r\n** Welcome to the BBS server. **\r\n********************************" 
     # msg =  "*************************************************************************************************************************************\r\n" + \
     #        "__        __   _                            _          _   _             ____  ____ ____                                             \r\n" + \
     #        "\ \      / /__| | ___ ___  _ __ ___   ___  | |_ ___   | |_| |__   ___   | __ )| __ ) ___|                                            \r\n" + \
@@ -137,7 +137,7 @@ def Client_Work(ClientSocket, addr):
                         msg_output = "SUC " + "Create board successfully."
                     else:
                         print("Board is already exist")
-                        msg_output = "ERR " + "Board is already exist."
+                        msg_output = "ERR " + "Board already exist."
                 SEND(CMD = msg_output)
 
 
@@ -273,7 +273,7 @@ def Client_Work(ClientSocket, addr):
             else:
                 cursor = c.execute("SELECT USERS.Username, POSTS.TITLE, POSTS.DTY, USERS.BucketName FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.PID = ?", (msg_split[1], )).fetchone()
                 print(cursor[0], cursor[1], cursor[2], cursor[3]) ##cursor[3] is BucketName
-                msg_output = "TROBLE " + cursor[3] + "# #" + "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--\r\n".format(cursor[0], cursor[1], cursor[2])
+                msg_output = "TROBLE " + cursor[3] + "# #" + "Author : {:>20} \r\nTitle  : {:>20} \r\nDate   : {:>20}\r\n--".format(cursor[0], cursor[1], cursor[2])
                 SEND(CMD = msg_output)
 
 
