@@ -174,7 +174,7 @@ def CPOST(CMD):
         Board, Title, Content = Get_BTC(CMD = CMD)
         cnt = Content.split("<br>")
         for iter_cnt in cnt:
-            print(iter_cnt)
+            # print(iter_cnt)
             os.system("echo {} >> ./.data/post/P{}".format(iter_cnt, PID))
         os.system("echo "" >> ./.data/comment/C{}".format(PID))
         target_bucket.upload_file("./.data/post/P{}".format(PID), "P{}".format(PID))
