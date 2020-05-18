@@ -438,7 +438,7 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "ERR " + "No such mail."
                 else:
                     print(cursor[0], cursor[1], cursor[2], cursor[3]) ##cursor[0] is MID
-                    msg_output = "TROBLE " + str(cursor[0]) + "# #" + "Subject   : {:>20} \r\nFROM      : {:>20} \r\nDate      : {:>20}\r\n--\r\n".format(cursor[1], cursor[2], cursor[3])
+                    msg_output = "TROBLE " + str(cursor[0]) + "# #" + "Subject   : {:>20} \r\nFROM      : {:>20} \r\nDate      : {:>20}\r\n--".format(cursor[1], cursor[2], cursor[3])
             SEND(CMD = msg_output)
 
 
