@@ -432,8 +432,8 @@ def Client_Work(ClientSocket, addr):
                 msg_output = "ERR " + "Please login first."
             else:
                 cursor = c.execute("SELECT MAILS.MID, MAILS.Subject, USERS.Username, MAILS.DTY FROM MAILS INNER JOIN USERS ON MAILS.Sender=USERS.UID WHERE MAILS.Receiver = ?", (login, )).fetchall() 
-                Mid = int(msg_split[1])
-                if len(cursor) < Mid:
+                Mid = int(msg_split[1]) - 1
+                if len(cursor) < Mid + 1:
                     print(cursor, "No such mail.")
                     msg_output = "ERR " + "No such mail."
                 else:
