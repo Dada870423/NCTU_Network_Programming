@@ -156,7 +156,7 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "DATA "
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
             elif hashtag in HBName: ## with keyword
@@ -170,7 +170,7 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "DATA "
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
                         print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n\r\n".format(row[0], row[1], row[2])
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
                     SEND(CMD = msg_output)
 
 
