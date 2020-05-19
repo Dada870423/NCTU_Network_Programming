@@ -168,9 +168,11 @@ def Client_Work(ClientSocket, addr):
                     SEND(CMD = NEG)
                 else:
                     msg_output = "DATA "
+                    InDex = 1
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )):
-                        print("{:>5} {:^20} {:^20}".format(row[0], row[1], row[2]))
-                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(row[0], row[1], row[2])
+                        print("{:>5} {:^20} {:^20}".format(InDex, row[1], row[2]))
+                        msg_output = msg_output + "{:>7} {:^20} {:^20}\r\n".format(InDex, row[1], row[2])
+                        InDex = InDex + 1
                     SEND(CMD = msg_output)
 
 
