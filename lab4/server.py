@@ -5,6 +5,7 @@ import time
 import sqlite3
 import os
 from sqlite3 import Error
+from kafka import KafkaProducer
 
 def Client_Work(ClientSocket, addr):
     def RECEIVE():
@@ -25,6 +26,7 @@ def Client_Work(ClientSocket, addr):
 
 
     ClientSocket.setblocking(0)
+    producer = KafkaProducer(bootstrap_servers=['127.0.0.1:9092'])
     
 
 
@@ -50,6 +52,8 @@ def Client_Work(ClientSocket, addr):
     TITLE = " --title "
     SUBJECT = " --subject "
     CONTENT = " --content "
+    BOARD = " --board "
+    KEYWORD = " --keyword "
     POS = "POS"
     NEG = "NEG"
     conn = sqlite3.connect('BBS.db')
@@ -209,6 +213,11 @@ def Client_Work(ClientSocket, addr):
                         print(NowTime, type(NowTime), "POST insertion is success")
                         msg_output = "TROBLE " + PID + "# #" + "Create post successfully."
                         SEND(CMD = msg_output)
+                        ### lab4
+                        #### data = [board_name, title, content]
+                        AuthorName = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
+                        producer.send(BoardTitle[0], PID.encode('utf-8'))
+                        producer.send(AuthorName[1], PID.encode('utf-8')) # id of latest post 
 
 
 
@@ -443,6 +452,30 @@ def Client_Work(ClientSocket, addr):
                     msg_output = "TROBLE " + str(cursor[Mid][0]) + "# #" + "Subject   : {:>20} \r\nFrom      : {:>20} \r\nDate      : {:>20}\r\n--".format(cursor[Mid][1], cursor[Mid][2], cursor[Mid][3])
             SEND(CMD = msg_output)
 
+        ## subscribe
+        if msg_input.startswith("subscribe "):         
+            if len(msg_split) > 5 and BOARD in msg_input and KEYWORD in msg_input:                                        
+                if login == -1:
+                    msg_output = "ERR " + "Please login first."
+                    SEND(CMD = msg_output)
+                elif msg_split[2] == "--keyword":
+                    print("He did not choose the board")
+                elif msg_split[0] == "subscribe":
+                    trash = msg_input.split(" --board ")
+                    BnameKeyword = trash.split(" --keyword ")                ## Bname   = B_A
+                    B_A = BnameKeyword[0]                                    ## author  = B_A
+                    KeyWord = BnameKeyword[1]                                ## keyword = KeyWord
+                    if msg_split[1] == "--board":
+                        print("subscribe board")
+                        msg_output = "SUC " + "subscribe board."
+                    elif msg_split[1] == "--author":
+                        print("subscribe author")
+                        msg_output = "SUC " + "subscribe author."
+                    SEND(CMD = msg_output)
+
+
+
+
 
 
         ## Command not found
@@ -486,6 +519,11 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Usage: delete-mail <mail#>" 
         elif msg_input.startswith("retr-mail"):
             msg_Usage = "Usage: retr-mail <mail#>" 
+        elif msg_input.startswith("subscribe"):
+            if msg_input.startswith("subscribe --b"):
+                msg_Usage = "subscribe --board <boardname> --keyword <keyword>"
+            else:
+                msg_Usage = "subscribe --author <authorname> --keyword <keyword> "
         else:
             msg_Usage = "Command not found"
 

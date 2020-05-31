@@ -1,9 +1,11 @@
 import socket
+import sqlite3
 import os
+from sqlite3 import Error
 import boto3
 import time
-
-
+import threading
+from kafka import KafkaConsumer
 
 POS = "POS"
 NEG = "NEG"
@@ -11,9 +13,55 @@ target_bucket = None
 board_Col_name = "{:^7} {:^20} {:^20}".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}".format("ID", "Title", "Author", "Date")
 mail_Col_name = "{:^7} {:^20} {:^20} {:^9}".format("ID", "Subject", "From", "Date")
-
+stop_flag = False
 
 s3 = boto3.resource('s3')
+conn = sqlite3.connect('BBS.db')
+c = conn.cursor()
+
+
+
+
+def consume(consumer):
+    global stop_flag
+    conn = sqlite3.connect('Database.db')
+    c = conn.cursor()
+    while True:		
+        msg = consumer.poll(timeout_ms = 500) ## fetch in 0.5sec
+        if msg:
+            time.sleep(0.3)			
+            for value in msg.values():				
+                for record in value:
+                    print_flag = False
+                    topic = record[0] ## board or author
+                    post_id = record[6].decode('utf-8')
+                    sql_return_post = c.execute('select * from POST where ID = ?', (post_id,)).fetchone()
+                    board = c.execute('select Name from BOARD where ID = ?',(sql_return_post[4],)).fetchone()[0]
+                    author = c.execute('select Username from USERS where UID = ?', (sql_return_post[2],)).fetchone()[0]
+					
+                    keyword_board = c.execute('select Keyword from Sub_BOARD where Board_name = ? and Subscriber_id = ?', (topic, uid))
+                    for row in keyword_board:
+                        if row[0] in sql_return_post[1] and not print_flag: # keyword in title or not
+                            print('*[{}]{} - by {}*\r\n% '.format(board, sql_return_post[1], author), end = '')
+                            print_flag = True
+                    keyword_author = c.execute('select Keyword from Sub_AUTHOR where Author_name = ? and Subscriber_id = ?', (topic, uid))
+                    for row in keyword_author:
+                        if row[0] in sql_return_post[1] and not print_flag:
+                            print('*[{}]{} - by {}*\r\n% '.format(board, sql_return_post[1], author), end = '')
+                            print_flag = True
+			
+        if stop_flag == True:
+            break 
+
+
+
+
+
+
+
+
+
+
 
 def MKDIR():
     Pdata = "./.data"
@@ -107,10 +155,15 @@ def REG(CMD):
 
 
 def LOGIN(CMD):
+    global stop_flag
     get = RECEIVE()	
     response, BWN = INT_handling(int_msg = get)
     if response == 6:
         LoginHandling(BWN = BWN)
+        consumer = KafkaConsumer(group_id = user_name, bootstrap_servers=['127.0.0.1:9092'])
+        #t = threading.Thread(target = consume, args = (consumer,))
+        #t.start()
+        stop_flag = False
 
 def LoginHandling(BWN):
     BN_WEL = BWN.split("# #") 
@@ -284,10 +337,17 @@ def RPOST(CMD):
         print(object_content)
 
 
+def SUBSCRIBE(CMD):
+    get = RECEIVE()
+    response, MidMsg = INT_handling(int_msg = get)
+    if response == 0:
+    	print("it is zero")
+        
 
 
 
-HOST = "3.92.193.75"
+
+HOST = "35.172.164.23"
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -336,6 +396,8 @@ while True:
         LMAIL(CMD = cmd)
     elif cmd.startswith("retr-mail"):
         RPOST(CMD = cmd)
+    elif cmd.startswith("subscribe"):
+        SUBSCRIBE(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)
