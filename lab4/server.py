@@ -115,6 +115,11 @@ def Client_Work(ClientSocket, addr):
                 login = -1
                 print("Bye from ", cursor[0], "\r\n")
                 msg_output = "SUC " + "Bye, " + cursor[1] + "."
+                #####
+                c.execute('DELETE FROM SUB_BOARD WHERE Subscriber_id = ?', (login,))
+                c.execute('DELETE FROM SUB_AUTHOR WHERE Subscriber_id = ?', (login,))
+                conn.commit()
+                #####
             else:
                 msg_output = "ERR " + "Please login first."
             SEND(CMD = msg_output)
@@ -462,8 +467,8 @@ def Client_Work(ClientSocket, addr):
                     print("He did not choose the board")
                 elif msg_split[0] == "subscribe":
                     B_AKey = msg_input.split(" --keyword ")
-                    B_A = B_AKey[0].replace("subscribe", "", 1)                ## Bname   = B_A    ## author  = B_A
-                    KeyWord = B_AKey[1]                                ## keyword = KeyWord
+                    B_A = B_AKey[0].replace("subscribe", "", 1)                ## Bname   = Bname    ## author  = Author
+                    KeyWord = B_AKey[1]                                        ## keyword = KeyWord
                     if msg_split[1] == "--board":
                         print("subscribe board")
                         Bname = B_AKey[0].split(" --board ")
