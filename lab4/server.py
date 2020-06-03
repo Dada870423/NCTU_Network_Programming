@@ -461,15 +461,20 @@ def Client_Work(ClientSocket, addr):
                 elif msg_split[2] == "--keyword":
                     print("He did not choose the board")
                 elif msg_split[0] == "subscribe":
-                    trash = msg_input.split(" --board ")
-                    BnameKeyword = trash.split(" --keyword ")                ## Bname   = B_A
-                    B_A = BnameKeyword[0]                                    ## author  = B_A
-                    KeyWord = BnameKeyword[1]                                ## keyword = KeyWord
+                    B_AKey = msg_input.split(" --keyword ")
+                    B_A = B_AKey[0].replace("subscribe", "", 1)                ## Bname   = B_A    ## author  = B_A
+                    KeyWord = B_AKey[1]                                ## keyword = KeyWord
                     if msg_split[1] == "--board":
                         print("subscribe board")
+                        Bname = B_AKey.split(" --board ")
+                        Bname = Bname[1]
+                        print(Bname)
                         msg_output = "SUC " + "subscribe board."
                     elif msg_split[1] == "--author":
                         print("subscribe author")
+                        Author = B_AKey.split(" --author ")
+                        Author = Author[1]
+                        print(Bname)
                         msg_output = "SUC " + "subscribe author."
                     SEND(CMD = msg_output)
 
