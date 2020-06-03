@@ -19,7 +19,7 @@ s3 = boto3.resource('s3')
 conn = sqlite3.connect('BBS.db')
 c = conn.cursor()
 
-
+Imput_split = ""
 
 
 def consume(consumer):
@@ -123,12 +123,14 @@ def INT_handling(int_msg):
 
 
 def CmdLine():
+    global Imput_split
     cmd = input("% ")
     test = cmd.replace(' ', '')
     while test == "":
         cmd = input("% ")
         test = cmd.replace(' ', '')
     SEND(CMD = cmd)
+    Imput_split = cmd.split()
     return cmd
 
 
@@ -160,9 +162,10 @@ def LOGIN(CMD):
     response, BWN = INT_handling(int_msg = get)
     if response == 6:
         LoginHandling(BWN = BWN)
+        user_name = Imput_split[1]
         consumer = KafkaConsumer(group_id = user_name, bootstrap_servers=['127.0.0.1:9092'])
-        #t = threading.Thread(target = consume, args = (consumer,))
-        #t.start()
+        t = threading.Thread(target = consume, args = (consumer,))
+        t.start()
         stop_flag = False
 
 def LoginHandling(BWN):
