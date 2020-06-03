@@ -126,6 +126,12 @@ def Client_Work(ClientSocket, addr):
         ## exit
         if msg_input == "exit":
             print("the client ", login," want to bye")
+            if login > -1:
+                #####
+                c.execute('DELETE FROM SUB_BOARD WHERE Subscriber_id = ?', (login,))
+                c.execute('DELETE FROM SUB_AUTHOR WHERE Subscriber_id = ?', (login,))
+                conn.commit()
+                #####
             ClientSocket.close()
             break
 
@@ -467,14 +473,22 @@ def Client_Work(ClientSocket, addr):
                     print("He did not choose the board")
                 elif msg_split[0] == "subscribe":
                     B_AKey = msg_input.split(" --keyword ")
-                    B_A = B_AKey[0].replace("subscribe", "", 1)                ## Bname   = Bname    ## author  = Author
+                    #B_A = B_AKey[0].replace("subscribe", "", 1)                ## Bname   = Bname    ## author  = Author
                     KeyWord = B_AKey[1]                                        ## keyword = KeyWord
                     if msg_split[1] == "--board":
-                        print("subscribe board")
                         Bname = B_AKey[0].split(" --board ")
                         Bname = Bname[1]
-                        print(Bname)
-                        msg_output = "SUC " + "subscribe board."
+                        print("subscribe board: ", Bname)
+                        #####
+                        cursor = c.execute('SELECT * FROM SUB_BOARD WHERE Board_name = ? and Keyword = ? and Subscriber_id = ?', (Bname, KeyWord, login)).fetchone()
+                        if cursor != None:
+                            msg_output = "ERR " + "Already subscribed."
+                        else:
+                            cursor = c.execute('INSERT INTO SUB_BOARD ("Board_name", "Keyword", "Subscriber_id") VALUES (?,?,?)', (Bname, KeyWord, login))
+                            conn.commit()
+                            print("Subscribe successfully")
+                            msg_output = "TROBLE " + "Subscribe successfully" + "# #" + Bname + "# #" + str(login)
+                        #####
                     elif msg_split[1] == "--author":
                         print("subscribe author")
                         Author = B_AKey[0].split(" --author ")

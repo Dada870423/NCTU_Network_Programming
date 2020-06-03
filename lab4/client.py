@@ -343,9 +343,29 @@ def RPOST(CMD):
 
 def SUBSCRIBE(CMD):
     get = RECEIVE()
-    response, MidMsg = INT_handling(int_msg = get)
+    response, MSGBname = INT_handling(int_msg = get)
     if response == 0:
     	print("it is zero")
+    elif response == 6:
+        MSGBname = MSGBname.split("# #")
+        MSG = MSGBname[0]
+        Bname = MSGBname[1]
+        login = MSGBname[2]
+        print(MSG)
+        topic = []
+        ## board to topic
+        cursor = c.execute('SELECT Board_name FROM SUB_BOARD WHERE Subscriber_id = ?', (login,))
+        for row in cursor:
+            topic.append(row[0])
+        ## author to topic
+        cursor = c.execute('SELECT Author_name FROM SUB_AUTHOR WHERE Subscriber_id = ?', (login,))
+        for row in cursor:
+            topic.append(row[0])
+        consumer.subscribe(topics = (topic))
+
+
+
+
         
 
 
