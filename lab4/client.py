@@ -24,7 +24,7 @@ Imput_split = ""
 
 def consume(consumer):
     global stop_flag
-    conn = sqlite3.connect('Database.db')
+    conn = sqlite3.connect('BBS.db')
     c = conn.cursor()
     while True:		
         msg = consumer.poll(timeout_ms = 500) ## fetch in 0.5sec
@@ -370,7 +370,7 @@ while True:
 
 
     if cmd == "exit":
-    	break
+    	sys.exit()
     elif cmd.startswith("register"):
         REG(CMD = cmd)
     elif cmd.startswith("login"):

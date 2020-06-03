@@ -454,7 +454,7 @@ def Client_Work(ClientSocket, addr):
 
         ## subscribe
         if msg_input.startswith("subscribe "):         
-            if len(msg_split) > 5 and BOARD in msg_input and KEYWORD in msg_input:                                        
+            if len(msg_split) > 4 and (BOARD in msg_input or KEYWORD in msg_input):                                        
                 if login == -1:
                     msg_output = "ERR " + "Please login first."
                     SEND(CMD = msg_output)
