@@ -466,15 +466,15 @@ def Client_Work(ClientSocket, addr):
                     KeyWord = B_AKey[1]                                ## keyword = KeyWord
                     if msg_split[1] == "--board":
                         print("subscribe board")
-                        Bname = B_AKey.split(" --board ")
+                        Bname = B_AKey[0].split(" --board ")
                         Bname = Bname[1]
                         print(Bname)
                         msg_output = "SUC " + "subscribe board."
                     elif msg_split[1] == "--author":
                         print("subscribe author")
-                        Author = B_AKey.split(" --author ")
+                        Author = B_AKey[0].split(" --author ")
                         Author = Author[1]
-                        print(Bname)
+                        print(Author)
                         msg_output = "SUC " + "subscribe author."
                     SEND(CMD = msg_output)
 
