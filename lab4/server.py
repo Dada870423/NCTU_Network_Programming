@@ -510,7 +510,15 @@ def Client_Work(ClientSocket, addr):
                         
                     SEND(CMD = msg_output)
 
-
+        ## Unsubscribe
+        if msg_input.startswith("unsubscribe ") and len(msg_split) > 2:
+            if login == -1:
+                msg_output = "ERR " + "Please login first."
+                SEND(CMD = msg_output)
+            elif msg_split[1] == "--board":
+                print("unsubscribe board")
+            elif msg_split[1] == "author":
+            	print("unsubscribe author")
 
 
 
@@ -558,9 +566,14 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Usage: retr-mail <mail#>" 
         elif msg_input.startswith("subscribe"):
             if msg_input.startswith("subscribe --b"):
-                msg_Usage = "Usage: subscribe --board <boardname> --keyword <keyword>"
+                msg_Usage = "Usage: subscribe --board <board-name> --keyword <keyword>"
             else:
-                msg_Usage = "Usage: subscribe --author <authorname> --keyword <keyword> "
+                msg_Usage = "Usage: subscribe --author <author-name> --keyword <keyword> "
+        elif msg_input.startswith("unsubscribe"):
+            if msg_input.startswith("unsubscribe --b"):
+                msg_Usage = "Usage: unsubscribe --board <board-name>"
+            else:
+                msg_Usage = "Usage: unsubscribe --author <author-name>"
         else:
             msg_Usage = "Command not found"
 
