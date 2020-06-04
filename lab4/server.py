@@ -166,7 +166,8 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute("SELECT * FROM BOARDS").fetchone()
                 if cursor == None:
                     print(cursor)
-                    SEND(CMD = NEG)
+                    msg_output = NEG
+                    SEND(CMD = msg_output)
                 else:
                     msg_output = "DATA "
                     for row in c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID"):
@@ -180,6 +181,7 @@ def Client_Work(ClientSocket, addr):
                 cursor = c.execute("SELECT BOARDS.BID, BOARDS.BName, USERS.Username FROM BOARDS INNER JOIN USERS ON BOARDS.UID=USERS.UID WHERE BOARDS.BName LIKE ?", (BName, )).fetchone()
                 if cursor == None:
                     print(cursor)
+                    msg_output = NEG
                     SEND(CMD = NEG)
                 else:
                     msg_output = "DATA "
@@ -255,7 +257,8 @@ def Client_Work(ClientSocket, addr):
                         cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)).fetchone()
                         if cursor == None:  ## there is not any post in this board 
                             print(cursor)
-                            SEND(CMD = NEG)
+                            msg_output = NEG
+                            SEND(CMD = msg_output)
                         else:
                             msg_output = "DATA "
                             for row in c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=? and POSTS.TITLE LIKE ?", (BName, keyword)):
@@ -275,6 +278,7 @@ def Client_Work(ClientSocket, addr):
                     cursor = c.execute("SELECT POSTS.PID, POSTS.TITLE, USERS.Username, POSTS.DT FROM POSTS INNER JOIN USERS ON POSTS.UID=USERS.UID WHERE POSTS.BName=?", (BName, )).fetchone()
                     if cursor == None:  ## there is not any post in this board 
                         print(cursor)
+                        msg_output = NEG
                         SEND(CMD = NEG)
                     else:
                         msg_output = "DATA "
@@ -487,14 +491,14 @@ def Client_Work(ClientSocket, addr):
                             cursor = c.execute('INSERT INTO SUB_BOARD ("Board_name", "Keyword", "Subscriber_id") VALUES (?,?,?)', (Bname, KeyWord, login))
                             conn.commit()
                             print("Subscribe successfully")
-                            msg_output = "TROBLE " + "Subscribe successfully" + "# #" + Bname + "# #" + str(login)
+                            msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Bname + "# #" + str(login)
                         #####
                     elif msg_split[1] == "--author":
                         print("subscribe author")
                         Author = B_AKey[0].split(" --author ")
                         Author = Author[1]
                         print(Author)
-                        msg_output = "SUC " + "subscribe author."
+                        msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Author + "# #" + str(login)
                     SEND(CMD = msg_output)
 
 
