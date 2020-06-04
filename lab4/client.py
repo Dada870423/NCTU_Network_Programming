@@ -36,9 +36,11 @@ def consume(consumer):
                     print_flag = False
                     topic = record[0] ## board or author
                     post_id = record[6].decode('utf-8')
-                    print("post_id:", post_id)
+                    #print("post_id:", post_id)
                     sql_return_post = c.execute('SELECT * FROM POSTS WHERE PID = ?', (post_id,)).fetchone()
-                    print("sql_return_post:", sql_return_post)
+                    if sql_return_post == None:
+                    	continue
+                    #print("sql_return_post:", sql_return_post)
                     Bname = sql_return_post[2]
                     #board = c.execute('SELECT BName FROM BOARDS where BID = ?',(sql_return_post[2],)).fetchone()[0]
                     author = c.execute('SELECT Username FROM USERS where UID = ?', (sql_return_post[3],)).fetchone()[0]
@@ -179,7 +181,7 @@ def LoginHandling(BWN):
     WelcomeName = BN_WEL[1]
     print(WelcomeName)
     login = int(BN_WEL[2])
-    print(login)
+    #print(login)
     target_bucket = s3.Bucket(BucketName)
     return BucketName
 
