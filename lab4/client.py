@@ -19,7 +19,7 @@ stop_flag = False
 s3 = boto3.resource('s3')
 conn = sqlite3.connect('BBS.db')
 c = conn.cursor()
-
+consumer = None
 Imput_split = ""
 
 
@@ -158,7 +158,7 @@ def REG(CMD):
 
 
 def LOGIN(CMD):
-    global stop_flag
+    global stop_flag, consumer
     get = RECEIVE()	
     response, BWN = INT_handling(int_msg = get)
     if response == 6:
@@ -188,9 +188,10 @@ def WHOAMI(CMD):
 def LOGOUT(CMD):
     get = RECEIVE()
     INT_handling(int_msg = get)
-    global target_bucket, stop_flag
+    global target_bucket, stop_flag, consumer
     target_bucket = None
     stop_flag = True
+    consumer = None
 
 
 def CBOARD(CMD):
