@@ -517,8 +517,12 @@ def Client_Work(ClientSocket, addr):
                 SEND(CMD = msg_output)
             elif msg_split[1] == "--board":
                 print("unsubscribe board")
-            elif msg_split[1] == "author":
+                msg_output = "SUC " + "unsubscribe board."
+                SEND(CMD = msg_output)
+            elif msg_split[1] == "--author":
             	print("unsubscribe author")
+                msg_output = "SUC " + "unsubscribe board."
+                SEND(CMD = msg_output)
 
 
 
