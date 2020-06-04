@@ -21,7 +21,7 @@ conn = sqlite3.connect('BBS.db')
 c = conn.cursor()
 consumer = None
 Imput_split = ""
-
+login = -1
 
 def consume(consumer):
     global stop_flag
@@ -36,19 +36,20 @@ def consume(consumer):
                     print_flag = False
                     topic = record[0] ## board or author
                     post_id = record[6].decode('utf-8')
-                    sql_return_post = c.execute('select * from POST where ID = ?', (post_id,)).fetchone()
-                    board = c.execute('select Name from BOARD where ID = ?',(sql_return_post[4],)).fetchone()[0]
-                    author = c.execute('select Username from USERS where UID = ?', (sql_return_post[2],)).fetchone()[0]
+                    sql_return_post = c.execute('SELECT * FROM POSTS WHERE PID = ?', (post_id,)).fetchone()
+                    Bname = sql_return_post[2]
+                    #board = c.execute('SELECT BName FROM BOARDS where BID = ?',(sql_return_post[2],)).fetchone()[0]
+                    author = c.execute('SELECT Username FROM USERS where UID = ?', (sql_return_post[3],)).fetchone()[0]
 					
-                    keyword_board = c.execute('select Keyword from Sub_BOARD where Board_name = ? and Subscriber_id = ?', (topic, uid))
+                    keyword_board = c.execute('SELECT Keyword FROM Sub_BOARD WHERE Board_name = ? and Subscriber_id = ?', (topic, login))
                     for row in keyword_board:
                         if row[0] in sql_return_post[1] and not print_flag: # keyword in title or not
-                            print('*[{}]{} - by {}*\r\n% '.format(board, sql_return_post[1], author), end = '')
+                            print('*[{}]{} - by {}*\r\n% '.format(Bname, sql_return_post[1], author), end = "")
                             print_flag = True
-                    keyword_author = c.execute('select Keyword from Sub_AUTHOR where Author_name = ? and Subscriber_id = ?', (topic, uid))
+                    keyword_author = c.execute('SELECT Keyword FROM Sub_AUTHOR WHERE Author_name = ? and Subscriber_id = ?', (topic, login))
                     for row in keyword_author:
                         if row[0] in sql_return_post[1] and not print_flag:
-                            print('*[{}]{} - by {}*\r\n% '.format(board, sql_return_post[1], author), end = '')
+                            print('*[{}]{} - by {}*\r\n% '.format(Bname, sql_return_post[1], author), end = "")
                             print_flag = True
 			
         if stop_flag == True:
@@ -170,11 +171,13 @@ def LOGIN(CMD):
         stop_flag = False
 
 def LoginHandling(BWN):
+    global target_bucket, login    
     BN_WEL = BWN.split("# #") 
     BucketName = BN_WEL[0]
     WelcomeName = BN_WEL[1]
     print(WelcomeName)
-    global target_bucket
+    login = int(N_WEL[2])
+    print(login)
     target_bucket = s3.Bucket(BucketName)
     return BucketName
 
@@ -188,10 +191,11 @@ def WHOAMI(CMD):
 def LOGOUT(CMD):
     get = RECEIVE()
     INT_handling(int_msg = get)
-    global target_bucket, stop_flag, consumer
+    global target_bucket, stop_flag, consumer, login
     target_bucket = None
     stop_flag = True
     consumer = None
+    login = -1
 
 
 def CBOARD(CMD):
@@ -352,7 +356,7 @@ def SUBSCRIBE(CMD):
         MSGBname = MSGBname.split("# #")
         MSG = MSGBname[0]
         Bname = MSGBname[1]
-        login = MSGBname[2]
+        #login = MSGBname[2]
         print(MSG)
         topic = []
         ## board to topic

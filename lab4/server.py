@@ -93,7 +93,7 @@ def Client_Work(ClientSocket, addr):
                     if cursor != None and cursor[3] == msg_split[2]: #person is exist
                         print("She is ", cursor[0], cursor[1])
                         login = cursor[0]
-                        msg_output = "TROBLE " + cursor[4] + "# #" + "Welcome, " + cursor[1] + "."
+                        msg_output = "TROBLE " + cursor[4] + "# #" + "Welcome, " + cursor[1] + "." + "# #" + str(login)
                         SEND(CMD = msg_output)
                     else:   # no such person or password is incorrect
                         msg_output = "ERR " + "Login failed."
@@ -491,7 +491,7 @@ def Client_Work(ClientSocket, addr):
                             cursor = c.execute('INSERT INTO SUB_BOARD ("Board_name", "Keyword", "Subscriber_id") VALUES (?,?,?)', (Bname, KeyWord, login))
                             conn.commit()
                             print("Subscribe successfully")
-                            msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Bname + "# #" + str(login)
+                            msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Bname
                         #####
                     elif msg_split[1] == "--author":
                         Author = B_AKey[0].split(" --author ")
@@ -502,10 +502,10 @@ def Client_Work(ClientSocket, addr):
                         if cursor != None:
                             msg_output = "ERR " + "Already subscribed."
                         else:
-                        	c.execute('INSERT INTO SUB_AUTHOR ("Author_name", "Keyword", "Subscriber_id") VALUES (?,?,?)', (Author, KeyWord, login))
+                            c.execute('INSERT INTO SUB_AUTHOR ("Author_name", "Keyword", "Subscriber_id") VALUES (?,?,?)', (Author, KeyWord, login))
                             conn.commit()
                             print("Subscribe author successfully")
-                            msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Author + "# #" + str(login)
+                            msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Author
                         #####
                         
                     SEND(CMD = msg_output)
