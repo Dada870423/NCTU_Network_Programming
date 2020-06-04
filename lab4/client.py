@@ -188,8 +188,9 @@ def WHOAMI(CMD):
 def LOGOUT(CMD):
     get = RECEIVE()
     INT_handling(int_msg = get)
-    global target_bucket
+    global target_bucket, stop_flag
     target_bucket = None
+    stop_flag = True
 
 
 def CBOARD(CMD):
@@ -391,6 +392,7 @@ while True:
 
 
     if cmd == "exit":
+    	stop_flag = True
     	sys.exit()
     elif cmd.startswith("register"):
         REG(CMD = cmd)
