@@ -478,7 +478,7 @@ def Client_Work(ClientSocket, addr):
                 elif msg_split[0] == "subscribe":
                     B_AKey = msg_input.split(" --keyword ")
                     #B_A = B_AKey[0].replace("subscribe", "", 1)                ## Bname   = Bname    ## author  = Author
-                    KeyWord = B_AKey[1]                                        ## keyword = KeyWord
+                    KeyWord = B_AKey[1]                                         ## keyword = KeyWord
                     if msg_split[1] == "--board":
                         Bname = B_AKey[0].split(" --board ")
                         Bname = Bname[1]
@@ -494,11 +494,20 @@ def Client_Work(ClientSocket, addr):
                             msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Bname + "# #" + str(login)
                         #####
                     elif msg_split[1] == "--author":
-                        print("subscribe author")
                         Author = B_AKey[0].split(" --author ")
                         Author = Author[1]
-                        print(Author)
-                        msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Author + "# #" + str(login)
+                        print("subscribe author", Author)
+                        #####
+                        cursor = c.execute('SELECT * FROM SUB_AUTHOR WHERE Author_name = ? and Keyword = ? and Subscriber_id = ?', (Author, KeyWord, login)).fetchone()
+                        if cursor != None:
+                            msg_output = "ERR " + "Already subscribed."
+                        else:
+                        	c.execute('INSERT INTO SUB_AUTHOR ("Author_name", "Keyword", "Subscriber_id") VALUES (?,?,?)', (Author, KeyWord, login))
+                            conn.commit()
+                            print("Subscribe author successfully")
+                            msg_output = "TROBLE " + "Subscribe successfully." + "# #" + Author + "# #" + str(login)
+                        #####
+                        
                     SEND(CMD = msg_output)
 
 
@@ -549,9 +558,9 @@ def Client_Work(ClientSocket, addr):
             msg_Usage = "Usage: retr-mail <mail#>" 
         elif msg_input.startswith("subscribe"):
             if msg_input.startswith("subscribe --b"):
-                msg_Usage = "subscribe --board <boardname> --keyword <keyword>"
+                msg_Usage = "Usage: subscribe --board <boardname> --keyword <keyword>"
             else:
-                msg_Usage = "subscribe --author <authorname> --keyword <keyword> "
+                msg_Usage = "Usage: subscribe --author <authorname> --keyword <keyword> "
         else:
             msg_Usage = "Command not found"
 
