@@ -38,8 +38,8 @@ def consume(consumer):
                     post_id = record[6].decode('utf-8')
                     #print("post_id:", post_id)
                     sql_return_post = c.execute('SELECT * FROM POSTS WHERE PID = ?', (post_id,)).fetchone()
-                    if sql_return_post == None:
-                    	continue
+#                    if sql_return_post == None:
+#                    	continue
                     #print("sql_return_post:", sql_return_post)
                     Bname = sql_return_post[2]
                     #board = c.execute('SELECT BName FROM BOARDS where BID = ?',(sql_return_post[2],)).fetchone()[0]
