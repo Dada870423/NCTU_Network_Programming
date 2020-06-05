@@ -14,6 +14,7 @@ target_bucket = None
 board_Col_name = "{:^7} {:^20} {:^20}".format("Index", "Name", "Moderator")
 post_Col_name = "{:^7} {:^20} {:^20} {:^9}".format("ID", "Title", "Author", "Date")
 mail_Col_name = "{:^7} {:^20} {:^20} {:^9}".format("ID", "Subject", "From", "Date")
+sub_Col_name = "{:^20} {:^20}".format('Board_name', 'keyword')
 stop_flag = False
 
 s3 = boto3.resource('s3')
@@ -169,7 +170,8 @@ def LOGIN(CMD):
     if response == 6:
         LoginHandling(BWN = BWN)
         user_name = Imput_split[1]
-        consumer = KafkaConsumer(group_id = user_name, bootstrap_servers=['127.0.0.1:9092'])
+        GroupUser_name = user_name + "-" + str(time.time())
+        consumer = KafkaConsumer(group_id = GroupUser_name, bootstrap_servers=['127.0.0.1:9092'])
         t = threading.Thread(target = consume, args = (consumer,))
         t.start()
         stop_flag = False
@@ -379,7 +381,11 @@ def UNSUBSCRIBE(CMD):
     get = RECEIVE()
     INT_handling(int_msg = get)
 
-
+def LSUB(CMD):
+    get = RECEIVE()
+    if get.startswith("DATA") or get.startswith("NEG"):
+        print(sub_Col_name)
+    INT_handling(int_msg = get)
 
 
 HOST = "35.172.164.23"
@@ -436,6 +442,8 @@ while True:
         SUBSCRIBE(CMD = cmd)
     elif cmd.startswith("unsubscribe"):
         UNSUBSCRIBE(CMD = cmd)
+    elif cmd.startswith("list-sub"):
+        LBOARD(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)

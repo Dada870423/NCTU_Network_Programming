@@ -543,7 +543,19 @@ def Client_Work(ClientSocket, addr):
                 SEND(CMD = msg_output)
 
 
-
+        ## list the sub
+        if msg_input == "list-sub": 
+            print("Want to list ", login, " sub")
+            if login == -1:
+                msg_output = "ERR " + "Please login first."
+                SEND(CMD = msg_output)
+            else:
+                print("list")
+                msg_output = "DATA "
+                for row in c.execute('SELECT * FROM SUB_BOARD WHERE Subscriber_id = ?', (login,)):
+                    print("{:^20} {:^20}".format(row[1], row[2]))
+                    msg_output = msg_output + "{:>7} {:^20} {:^20} {:^9}\r\n".format(iter_sub, row[0], row[1], row[2])
+                SEND(CMD = msg_output)
 
         ## Command not found
         if msg_input.startswith("register"):
