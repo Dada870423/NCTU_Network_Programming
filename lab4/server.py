@@ -517,11 +517,29 @@ def Client_Work(ClientSocket, addr):
                 SEND(CMD = msg_output)
             elif msg_split[1] == "--board":
                 print("unsubscribe board")
-                msg_output = "SUC " + "unsubscribe board."
+                UnBname = msg_input.split(" --board ")
+                Bname = UnBname[1]
+                cursor = c.execute('SELECT * FROM SUB_BOARD WHERE Board_name = ? and Subscriber_id = ?', (Bname, login)).fetchone()
+                if cursor != None:
+                    c.execute('DELETE FROM SUB_BOARD WHERE Board_name = ?', (Bname,))
+                    conn.commit()
+                    msg_output = "SUC " + "Unsubscribe successfully."
+                else:
+                    print("You haven't subscribed.")
+                    msg_output = "ERR " + "You haven't subscribed " + Bname + "."
                 SEND(CMD = msg_output)
             elif msg_split[1] == "--author":
                 print("unsubscribe author")
-                msg_output = "SUC " + "unsubscribe board."
+                UnAuthor = msg_input.split(" --author ")
+                Author = UnAuthor[1]
+                cursor = c.execute('SELECT * FROM SUB_AUTHOR WHERE Author_name = ? and Subscriber_id = ?', (Author, login)).fetchone()
+                if cursor != None:
+                    c.execute('DELETE FROM SUB_AUTHOR WHERE Author_name = ?', (Author,))
+                    conn.commit()
+                    msg_output = "SUC " + "Unsubscribe successfully."
+                else:
+                    print("You haven't subscribed.")
+                    msg_output = "ERR " + "You haven't subscribed " + Author + "."
                 SEND(CMD = msg_output)
 
 

@@ -375,8 +375,9 @@ def SUBSCRIBE(CMD):
 
 
 
-
-        
+def UNSUBSCRIBE(CMD):
+    get = RECEIVE()
+    INT_handling(int_msg = get)
 
 
 
@@ -433,31 +434,8 @@ while True:
         RPOST(CMD = cmd)
     elif cmd.startswith("subscribe"):
         SUBSCRIBE(CMD = cmd)
+    elif cmd.startswith("unsubscribe"):
+        UNSUBSCRIBE(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
