@@ -554,7 +554,7 @@ def Client_Work(ClientSocket, addr):
                 msg_output = "DATA "
                 for row in c.execute('SELECT * FROM SUB_BOARD WHERE Subscriber_id = ?', (login,)):
                     print("{:^20} {:^20}".format(row[1], row[2]))
-                    msg_output = msg_output + " {:^20} {:^9}\r\n".format(row[1], row[2])
+                    msg_output = msg_output + " {:^20} {:^20}\r\n".format(row[1], row[2])
                 SEND(CMD = msg_output)
 
         ## Command not found
