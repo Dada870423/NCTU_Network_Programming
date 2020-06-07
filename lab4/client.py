@@ -388,7 +388,7 @@ def LSUB(CMD):
     INT_handling(int_msg = get)
 
 
-HOST = "35.172.164.23"
+HOST = "3.235.245.230"
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -443,7 +443,7 @@ while True:
     elif cmd.startswith("unsubscribe"):
         UNSUBSCRIBE(CMD = cmd)
     elif cmd.startswith("list-sub"):
-        LBOARD(CMD = cmd)
+        LSUB(CMD = cmd)
     else:
         get = RECEIVE()
         INT_handling(int_msg = get)
