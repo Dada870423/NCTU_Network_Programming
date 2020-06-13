@@ -112,7 +112,6 @@ def Client_Work(ClientSocket, addr):
         if msg_input == "logout":
             if login > -1:
                 cursor = c.execute('SELECT * FROM USERS WHERE UID = ?', (login,)).fetchone()
-                login = -1
                 print("Bye from ", cursor[0], "\r\n")
                 msg_output = "SUC " + "Bye, " + cursor[1] + "."
                 #####
@@ -120,6 +119,7 @@ def Client_Work(ClientSocket, addr):
                 c.execute('DELETE FROM SUB_AUTHOR WHERE Subscriber_id = ?', (login,))
                 conn.commit()
                 #####
+                login = -1
             else:
                 msg_output = "ERR " + "Please login first."
             SEND(CMD = msg_output)
@@ -555,6 +555,10 @@ def Client_Work(ClientSocket, addr):
                 for row in c.execute('SELECT * FROM SUB_BOARD WHERE Subscriber_id = ?', (login,)):
                     print("{:^20} {:^20}".format(row[1], row[2]))
                     msg_output = msg_output + " {:^20} {:^20}\r\n".format(row[1], row[2])
+                for now in c.execute('SELECT * FROM SUB_AUTHOR WHERE Subscriber_id = ?', (login,)):
+                    print("{:^20} {:^20}".format(row[1], row[2]))
+                    msg_output = msg_output + " {:^20} {:^20}\r\n".format(row[1], row[2])
+
                 SEND(CMD = msg_output)
 
         ## Command not found
