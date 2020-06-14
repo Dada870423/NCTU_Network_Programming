@@ -519,10 +519,10 @@ def Client_Work(ClientSocket, addr):
             elif msg_split[1] == "--board":
                 print("unsubscribe board")
                 UnBname = msg_input.split(" --board ")
-                Bname = UnBname[1]
+                Bname = UnBname[1] 
                 cursor = c.execute('SELECT * FROM SUB_BOARD WHERE Board_name = ? and Subscriber_id = ?', (Bname, login)).fetchone()
                 if cursor != None:
-                    c.execute('DELETE FROM SUB_BOARD WHERE Board_name = ?', (Bname,))
+                    c.execute('DELETE FROM SUB_BOARD WHERE Board_name = ? and Subscriber_id = ?', (Bname, login))
                     conn.commit()
                     msg_output = "SUC " + "Unsubscribe successfully."
                 else:
@@ -532,10 +532,10 @@ def Client_Work(ClientSocket, addr):
             elif msg_split[1] == "--author":
                 print("unsubscribe author")
                 UnAuthor = msg_input.split(" --author ")
-                Author = UnAuthor[1]
+                Author = UnAuthor[1] 
                 cursor = c.execute('SELECT * FROM SUB_AUTHOR WHERE Author_name = ? and Subscriber_id = ?', (Author, login)).fetchone()
                 if cursor != None:
-                    c.execute('DELETE FROM SUB_AUTHOR WHERE Author_name = ?', (Author,))
+                    c.execute('DELETE FROM SUB_AUTHOR WHERE Author_name = ? and Subscriber_id = ?', (Author, login))
                     conn.commit()
                     msg_output = "SUC " + "Unsubscribe successfully."
                 else:
