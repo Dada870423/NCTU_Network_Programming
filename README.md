@@ -1,30 +1,8 @@
 # Network Programming Course 2020
 
-## DataBases
-
-### USERS
-| Key | Property |
-| --- | ----------- | 
-|UID| INTEGER PRIMARY KEY AUTOINCREMENT | 
-|Username| TEXT NOT NULL UNIQUE | 
-|Email| TEXT NOT NULL | 
-|Password| TEXT NOT NULL | 
-|BucketId| TEXT NOT NULL | 
-
-### BOARDS
-| Key | Property |
-| --- | ----------- | 
-|BID| INTEGER PRIMARY KEY AUTOINCREMENT | 
-|BName| TEXT NOT NULL UNIQUE | 
-|UID| INTEGER | 
-
-### POSTS
-| Key | Property |
-| --- | ----------- | 
-|PID| INTEGER PRIMARY KEY AUTOINCREMENT | 
-|TITLE| TEXT NOT NULL | 
-|BName| TEXT | 
-|UID| INTEGER | 
-|DT| TEXT | 
-
+## Homework
+1. part1 Design a Bulletin Bouard System server.
+2. part2 Implement the functions of the Bulletin Board System (BBS) server.
+3. part3 Write a client program for BBS service.
+4. part4 Implement the subscription features for the BBS service.
 ~~HappyCoding~~ ~
